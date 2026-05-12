@@ -3,15 +3,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    Animated,
-    Dimensions,
-    Easing,
-    ImageBackground,
-    Modal,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Easing,
+  ImageBackground,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import TopNavBar from "../components/TopNavBar";
 import { useAuth } from "../context/AuthContext";
@@ -162,7 +162,7 @@ const Dashboard = () => {
     },
   ];
 
-  const StatCard = ({ value, label, icon, delay = 0 }) => {
+  const StatCard = ({ value, label, icon, delay = 0 }: { value: string; label: string; icon: any; delay?: number }) => {
     const statFadeAnim = useRef(new Animated.Value(0)).current;
     const statScaleAnim = useRef(new Animated.Value(0.5)).current;
 
@@ -286,7 +286,7 @@ const Dashboard = () => {
               style={{ width: width * 0.42 }}
               className="bg-[#0B2B1F] p-5 rounded-3xl border border-[#C5A059]/20 items-center shadow-lg"
               activeOpacity={0.8}
-              //   onPress={() => router.push("/groom-profiles")}
+               onPress={() => router.push("/groomprofiles")}
             >
               <Animated.View
                 style={{
@@ -315,7 +315,7 @@ const Dashboard = () => {
               style={{ width: width * 0.42 }}
               className="bg-[#0B2B1F] p-5 rounded-3xl border border-[#C5A059]/20 items-center shadow-lg"
               activeOpacity={0.8}
-              //   onPress={() => router.push("/bride-profiles")}
+               onPress={() => router.push("/brideprofiles")}
             >
               <Animated.View
                 style={{
@@ -421,7 +421,7 @@ const Dashboard = () => {
                     style={{ width: width * 0.27 }}
                     className="bg-[#0B2B1F] aspect-square rounded-[20px] border border-[#C5A059]/10 items-center justify-center mb-4 shadow-sm"
                     activeOpacity={0.7}
-                    onPress={() => router.push(item.route)}
+                    onPress={() => router.push(item.route as any)}
                   >
                     <Animated.View
                       style={{
@@ -584,7 +584,7 @@ const Dashboard = () => {
       >
         <TouchableOpacity
           className="bg-[#C5A059] w-14 h-14 rounded-full justify-center items-center shadow-lg"
-          onPress={() => router.push("/quick-match")}
+          onPress={() => router.push("/quick-match" as any)}
         >
           <Ionicons name="chatbubble-ellipses" size={24} color="#000" />
         </TouchableOpacity>
