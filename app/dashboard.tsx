@@ -115,12 +115,12 @@ const Dashboard = () => {
       color: "#C5A059",
       route: "/membership",
     },
-    {
-      label: "Payments",
-      icon: "receipt-outline",
-      color: "#C5A059",
-      route: "/payments",
-    },
+    // {
+    //   label: "Payments",
+    //   icon: "receipt-outline",
+    //   color: "#C5A059",
+    //   route: "/payments",
+    // },
     {
       label: "Search Profiles",
       icon: "search-outline",
