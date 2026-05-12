@@ -109,24 +109,14 @@ const Dashboard = () => {
       color: "#C5A059",
       route: "/photosEdit",
     },
-    {
-      label: "Membership",
-      icon: "card-outline",
-      color: "#C5A059",
-      route: "/membership",
-    },
-    {
-      label: "Payments",
-      icon: "receipt-outline",
-      color: "#C5A059",
-      route: "/payments",
-    },
-    {
-      label: "Search Profiles",
-      icon: "search-outline",
-      color: "#C5A059",
-      route: "/search",
-    },
+
+    // {
+    //   label: "Payments",
+    //   icon: "receipt-outline",
+    //   color: "#C5A059",
+    //   route: "/payments",
+    // },
+
   ];
 
   const membershipPlans = [
@@ -297,7 +287,7 @@ const Dashboard = () => {
               style={{ width: width * 0.42 }}
               className="bg-[#0B2B1F] p-5 rounded-3xl border border-[#C5A059]/20 items-center shadow-lg"
               activeOpacity={0.8}
-              //   onPress={() => router.push("/groom-profiles")}
+            //   onPress={() => router.push("/groom-profiles")}
             >
               <Animated.View
                 style={{
@@ -323,7 +313,7 @@ const Dashboard = () => {
               style={{ width: width * 0.42 }}
               className="bg-[#0B2B1F] p-5 rounded-3xl border border-[#C5A059]/20 items-center shadow-lg"
               activeOpacity={0.8}
-              //   onPress={() => router.push("/bride-profiles")}
+            //   onPress={() => router.push("/bride-profiles")}
             >
               <Animated.View
                 style={{
