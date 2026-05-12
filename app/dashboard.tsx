@@ -1,16 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    Animated,
-    Dimensions,
-    Easing,
-    ImageBackground,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Easing,
+  ImageBackground,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import TopNavBar from "../components/TopNavBar";
 import { useAuth } from "../context/AuthContext";
@@ -83,7 +83,14 @@ const Dashboard = () => {
     outputRange: ["0deg", "360deg"],
   });
 
-  const actionItems = [
+  type ActionItem = {
+    label: string;
+    icon: string;
+    color: string;
+    route: Href; // <--- This tells TS it's a valid Expo route!
+  };
+
+  const actionItems: ActionItem[] = [
     {
       label: "Edit Profile",
       icon: "person-outline",
@@ -153,9 +160,22 @@ const Dashboard = () => {
     },
   ];
 
-  const StatCard = ({ value, label, icon, delay = 0 }) => {
+  // Add the type definition object after the props
+  const StatCard = ({
+    value,
+    label,
+    icon,
+    delay = 0,
+  }: {
+    value: string;
+    label: string;
+    icon: any; // Using 'any' here to avoid complex Ionicons typing, or use 'string'
+    delay?: number;
+  }) => {
     const statFadeAnim = useRef(new Animated.Value(0)).current;
     const statScaleAnim = useRef(new Animated.Value(0.5)).current;
+
+    // ... rest of the component stays exactly the same
 
     useEffect(() => {
       setTimeout(() => {
@@ -297,9 +317,6 @@ const Dashboard = () => {
               <Text className="text-[#C5A059] text-[10px] font-bold uppercase tracking-widest mt-1">
                 2,345 Profiles
               </Text>
-              <View className="absolute -top-2 -right-2 bg-[#C5A059] rounded-full w-6 h-6 justify-center items-center">
-                <Text className="text-black text-xs font-bold">New</Text>
-              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -412,7 +429,7 @@ const Dashboard = () => {
                     style={{ width: width * 0.27 }}
                     className="bg-[#0B2B1F] aspect-square rounded-[20px] border border-[#C5A059]/10 items-center justify-center mb-4 shadow-sm"
                     activeOpacity={0.7}
-                    // onPress={() => router.push(item.route)}
+                    onPress={() => router.push(item.route)}
                   >
                     <Animated.View
                       style={{
@@ -536,14 +553,7 @@ const Dashboard = () => {
           right: 20,
           transform: [{ scale: pulseAnim }],
         }}
-      >
-        <TouchableOpacity
-          className="bg-[#C5A059] w-14 h-14 rounded-full justify-center items-center shadow-lg"
-          onPress={() => router.push("/quick-match")}
-        >
-          <Ionicons name="chatbubble-ellipses" size={24} color="#000" />
-        </TouchableOpacity>
-      </Animated.View>
+      ></Animated.View>
     </View>
   );
 };
