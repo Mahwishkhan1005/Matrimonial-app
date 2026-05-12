@@ -47,7 +47,7 @@ const GroomProfiles = () => {
     const renderItem = ({ item }: { item: typeof GROOM_PROFILES[0] }) => (
         <TouchableOpacity
             activeOpacity={0.9}
-            onPress={() => router.push("/profiledetails")}
+            onPress={() => router.push({ pathname: "/profiledetails", params: { gender: 'male' } })}
             style={{ width: COLUMN_WIDTH, height: COLUMN_WIDTH * 1.4 }}
             className="m-1.5 rounded-[20px] overflow-hidden border border-[#C5A059]/10"
         >
