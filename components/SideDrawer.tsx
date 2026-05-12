@@ -15,15 +15,19 @@ const SideDrawer = () => {
     {
       label: "Initial Details Edit",
       icon: "create-outline",
-      route: "/edit-details",
+      route: "/edit-profile",
     },
     {
       label: "Upload Photos Edit",
       icon: "image-outline",
-      route: "/edit-photos",
+      route: "/photosEdit",
     },
-    { label: "Groom Profiles", icon: "male-outline", route: "/grooms" },
-    { label: "Bride Profiles", icon: "female-outline", route: "/brides" },
+    { label: "Groom Profiles", icon: "male-outline", route: "/groomprofiles" },
+    {
+      label: "Bride Profiles",
+      icon: "female-outline",
+      route: "/brideprofiles",
+    },
     {
       label: "Change Password",
       icon: "key-outline",
