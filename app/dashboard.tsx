@@ -1,13 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
   Easing,
   ImageBackground,
-  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -21,7 +20,6 @@ const { width, height } = Dimensions.get("window");
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
   // Animation values
@@ -53,11 +51,6 @@ const Dashboard = () => {
       }),
     ]).start();
 
-    // Show welcome modal for new users
-    const timer = setTimeout(() => {
-      setShowWelcomeModal(true);
-    });
-
     // Continuous pulse animation for CTA buttons
     Animated.loop(
       Animated.sequence([
@@ -83,8 +76,6 @@ const Dashboard = () => {
         easing: Easing.linear,
       }),
     ).start();
-
-    return () => clearTimeout(timer);
   }, []);
 
   const rotateInterpolate = rotateAnim.interpolate({
@@ -92,7 +83,14 @@ const Dashboard = () => {
     outputRange: ["0deg", "360deg"],
   });
 
-  const actionItems = [
+  type ActionItem = {
+    label: string;
+    icon: string;
+    color: string;
+    route: Href; // <--- This tells TS it's a valid Expo route!
+  };
+
+  const actionItems: ActionItem[] = [
     {
       label: "Edit Profile",
       icon: "person-outline",
@@ -111,24 +109,14 @@ const Dashboard = () => {
       color: "#C5A059",
       route: "/photosEdit",
     },
-    {
-      label: "Membership",
-      icon: "card-outline",
-      color: "#C5A059",
-      route: "/membership",
-    },
-    {
-      label: "Payments",
-      icon: "receipt-outline",
-      color: "#C5A059",
-      route: "/payments",
-    },
-    {
-      label: "Search Profiles",
-      icon: "search-outline",
-      color: "#C5A059",
-      route: "/search",
-    },
+
+    // {
+    //   label: "Payments",
+    //   icon: "receipt-outline",
+    //   color: "#C5A059",
+    //   route: "/payments",
+    // },
+
   ];
 
   const membershipPlans = [
@@ -162,9 +150,22 @@ const Dashboard = () => {
     },
   ];
 
-  const StatCard = ({ value, label, icon, delay = 0 }: { value: string; label: string; icon: any; delay?: number }) => {
+  // Add the type definition object after the props
+  const StatCard = ({
+    value,
+    label,
+    icon,
+    delay = 0,
+  }: {
+    value: string;
+    label: string;
+    icon: any; // Using 'any' here to avoid complex Ionicons typing, or use 'string'
+    delay?: number;
+  }) => {
     const statFadeAnim = useRef(new Animated.Value(0)).current;
     const statScaleAnim = useRef(new Animated.Value(0.5)).current;
+
+    // ... rest of the component stays exactly the same
 
     useEffect(() => {
       setTimeout(() => {
@@ -286,7 +287,7 @@ const Dashboard = () => {
               style={{ width: width * 0.42 }}
               className="bg-[#0B2B1F] p-5 rounded-3xl border border-[#C5A059]/20 items-center shadow-lg"
               activeOpacity={0.8}
-               onPress={() => router.push("/groomprofiles")}
+            //   onPress={() => router.push("/groom-profiles")}
             >
               <Animated.View
                 style={{
@@ -306,16 +307,13 @@ const Dashboard = () => {
               <Text className="text-[#C5A059] text-[10px] font-bold uppercase tracking-widest mt-1">
                 2,345 Profiles
               </Text>
-              <View className="absolute -top-2 -right-2 bg-[#C5A059] rounded-full w-6 h-6 justify-center items-center">
-                <Text className="text-black text-xs font-bold">New</Text>
-              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{ width: width * 0.42 }}
               className="bg-[#0B2B1F] p-5 rounded-3xl border border-[#C5A059]/20 items-center shadow-lg"
               activeOpacity={0.8}
-               onPress={() => router.push("/brideprofiles")}
+            //   onPress={() => router.push("/bride-profiles")}
             >
               <Animated.View
                 style={{
@@ -421,7 +419,7 @@ const Dashboard = () => {
                     style={{ width: width * 0.27 }}
                     className="bg-[#0B2B1F] aspect-square rounded-[20px] border border-[#C5A059]/10 items-center justify-center mb-4 shadow-sm"
                     activeOpacity={0.7}
-                    onPress={() => router.push(item.route as any)}
+                    onPress={() => router.push(item.route)}
                   >
                     <Animated.View
                       style={{
@@ -537,42 +535,6 @@ const Dashboard = () => {
         </View>
       </Animated.View>
 
-      {/* Welcome Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showWelcomeModal}
-        onRequestClose={() => setShowWelcomeModal(false)}
-      >
-        <View className="flex-1 justify-center items-center bg-black/80">
-          <Animated.View
-            style={{
-              transform: [{ scale: scaleAnim }],
-            }}
-            className="bg-[#0A1C14] rounded-3xl p-8 mx-6 border border-[#C5A059]/30 w-[90%]"
-          >
-            <View className="items-center">
-              <View className="bg-[#C5A059]/20 p-4 rounded-full mb-4">
-                <Ionicons name="sparkles" size={40} color="#C5A059" />
-              </View>
-              <Text className="text-white text-2xl font-bold text-center mb-2">
-                Welcome to Eternal Partner!
-              </Text>
-              <Text className="text-white/60 text-center mb-6">
-                Your journey to finding the perfect match begins here. Complete
-                your profile to get better matches.
-              </Text>
-              <TouchableOpacity
-                className="bg-[#C5A059] px-8 py-3 rounded-full"
-                onPress={() => setShowWelcomeModal(false)}
-              >
-                <Text className="text-black font-bold">Get Started</Text>
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </View>
-      </Modal>
-
       {/* Floating Action Button */}
       <Animated.View
         style={{
@@ -581,14 +543,7 @@ const Dashboard = () => {
           right: 20,
           transform: [{ scale: pulseAnim }],
         }}
-      >
-        <TouchableOpacity
-          className="bg-[#C5A059] w-14 h-14 rounded-full justify-center items-center shadow-lg"
-          onPress={() => router.push("/quick-match" as any)}
-        >
-          <Ionicons name="chatbubble-ellipses" size={24} color="#000" />
-        </TouchableOpacity>
-      </Animated.View>
+      ></Animated.View>
     </View>
   );
 };
