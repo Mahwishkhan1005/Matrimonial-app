@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setUser(null);
       await AsyncStorage.removeItem("userSession");
+      await AsyncStorage.removeItem("userToken"); // Clear token as well
     } catch (e) {
       console.error("Failed to clear login session", e);
     }

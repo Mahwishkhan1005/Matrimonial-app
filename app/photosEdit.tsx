@@ -2,35 +2,64 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import api from "../axios/axiosInterceptor";
 import TopNavBar from "../components/TopNavBar";
+import { useAuth } from "../context/AuthContext";
 
 const { width } = Dimensions.get("window");
 const BOX_WIDTH = (width - 48 - 16) / 2; // Screen width minus padding and gap
 
 const PhotosEdit = () => {
   const router = useRouter();
+  const { user } = useAuth();
 
-  // State to hold the 4 image URIs (null means no image uploaded yet)
-  const [images, setImages] = useState<string | null[]>([
+  // State to hold image objects { id, imageUrl, userid }
+  const [images, setImages] = useState<(any | null)[]>([
     null,
     null,
     null,
     null,
   ]);
+  const [loading, setLoading] = useState(false);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
-  // Function to pick an image from the device gallery
+  useEffect(() => {
+    fetchImages();
+  }, []);
+
+  const fetchImages = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get("/user/images");
+      // Map API response to our 4-slot grid
+      const fetchedImages = response.data || [];
+      const newImages = [null, null, null, null];
+      fetchedImages.forEach((img: any, index: number) => {
+        if (index < 4) newImages[index] = img;
+      });
+      setImages(newImages);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      // Alert.alert("Error", "Failed to load images.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to pick an image and upload/update
   const pickImage = async (index: number) => {
-    // Request permission (Expo handles this under the hood mostly, but good practice)
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (status !== "granted") {
@@ -44,32 +73,121 @@ const PhotosEdit = () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 5], // Standard portrait aspect ratio
+      aspect: [4, 5],
       quality: 0.8,
     });
 
     if (!result.canceled) {
-      const newImages = [...images];
-      newImages[index] = result.assets[0].uri;
-      setImages(newImages);
+      const asset = result.assets[0];
+      let uri = asset.uri;
+
+      const formData = new FormData();
+      const existingImage = images[index];
+      const key = existingImage && existingImage.id ? "file" : "files";
+      const fileName = asset.fileName || `photo_${index}.jpg`;
+      const mimeType = asset.mimeType || "image/jpeg";
+
+      setUploadingIndex(index);
+      try {
+        if (Platform.OS === "web") {
+          // Web: Must convert URI to Blob/File for FormData to work correctly
+          const response = await fetch(uri);
+          const blob = await response.blob();
+          formData.append(key, blob, fileName);
+        } else {
+          // Native: Use the object format
+          if (Platform.OS === "android" && !uri.startsWith("file://")) {
+            uri = `file://${uri}`;
+          }
+          formData.append(key, {
+            uri,
+            name: fileName,
+            type: mimeType,
+          } as any);
+        }
+
+        // Configuration to handle the header conflict with the global interceptor
+        const config = {
+          headers: {
+            // On Web, we MUST leave Content-Type undefined so the browser adds the boundary
+            // On Native, we usually need to set it explicitly
+            "Content-Type":
+              Platform.OS === "web"
+                ? "multipart/form-data"
+                : "multipart/form-data",
+          },
+          // This is a trick to force Axios to NOT use the default application/json from the interceptor
+          transformRequest: (data: any, headers: any) => {
+            if (Platform.OS === "web") {
+              delete headers["Content-Type"]; // Let the browser set it with boundary
+            }
+            return data;
+          },
+        };
+
+        if (existingImage && existingImage.id) {
+          // UPDATE existing image (PUT)
+          await api.put(
+            `/user/update-image/${existingImage.id}`,
+            formData,
+            config,
+          );
+          Alert.alert("Success", "Image updated successfully!");
+        } else {
+          // UPLOAD new image (POST)
+          await api.post("/user/upload-images", formData, config);
+          Alert.alert("Success", "Image uploaded successfully!");
+        }
+        fetchImages();
+      } catch (error) {
+        console.error("Upload error:", error);
+        Alert.alert(
+          "Upload Failed",
+          "Could not upload image. Please try again.",
+        );
+      } finally {
+        setUploadingIndex(null);
+      }
     }
   };
 
   // Function to remove an image
   const deleteImage = (index: number) => {
+    const imageToDelete = images[index];
+    if (!imageToDelete) return;
+
     Alert.alert("Delete Photo", "Are you sure you want to remove this photo?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => {
-          const newImages = [...images];
-          newImages[index] = null;
-          setImages(newImages);
+        onPress: async () => {
+          setLoading(true);
+          try {
+            await api.delete(`/user/delete-image/${imageToDelete.id}`);
+            Alert.alert("Deleted", "Image Deleted Successfully");
+            fetchImages();
+          } catch (error) {
+            console.error("Delete error:", error);
+            Alert.alert("Error", "Failed to delete image.");
+          } finally {
+            setLoading(false);
+          }
         },
       },
     ]);
   };
+
+  if (loading && images.every((img) => img === null)) {
+    return (
+      <View className="flex-1 bg-[#F0F7FA] justify-center items-center">
+        <ActivityIndicator size="large" color="#2D89B5" />
+        <Text className="mt-4 text-[#2D89B5] font-medium">
+          Loading Photos...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#F0F7FA]">
@@ -95,11 +213,18 @@ const PhotosEdit = () => {
                   style={{ width: BOX_WIDTH, height: BOX_WIDTH * 1.2 }}
                   className="rounded-2xl overflow-hidden border border-blue-100 relative shadow-md shadow-blue-100 bg-white"
                 >
-                  <Image
-                    source={{ uri: images[index] as string }}
-                    style={{ width: "100%", height: "100%" }}
-                    resizeMode="cover"
-                  />
+                  {uploadingIndex === index ? (
+                    <View className="flex-1 justify-center items-center">
+                      <ActivityIndicator color="#2D89B5" />
+                    </View>
+                  ) : (
+                    <Image
+                      source={{ uri: images[index].imageUrl }}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode="cover"
+                    />
+                  )}
+
                   {/* Overlay Controls */}
                   <LinearGradient
                     colors={["transparent", "rgba(0,0,0,0.8)"]}
@@ -124,18 +249,25 @@ const PhotosEdit = () => {
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => pickImage(index)}
+                  disabled={uploadingIndex !== null}
                   style={{ width: BOX_WIDTH, height: BOX_WIDTH * 1.2 }}
                   className="bg-white rounded-2xl border-2 border-dashed border-blue-200 justify-center items-center shadow-sm shadow-blue-50"
                 >
-                  <View className="w-12 h-12 rounded-full bg-[#2D89B5]/10 justify-center items-center mb-3">
-                    <Ionicons name="camera" size={24} color="#2D89B5" />
-                  </View>
-                  <Text className="text-[#2D89B5] font-bold text-xs uppercase tracking-wider">
-                    Click Here
-                  </Text>
-                  <Text className="text-gray-400 font-medium text-[10px] mt-1">
-                    Upload Photo
-                  </Text>
+                  {uploadingIndex === index ? (
+                    <ActivityIndicator color="#2D89B5" />
+                  ) : (
+                    <>
+                      <View className="w-12 h-12 rounded-full bg-[#2D89B5]/10 justify-center items-center mb-3">
+                        <Ionicons name="camera" size={24} color="#2D89B5" />
+                      </View>
+                      <Text className="text-[#2D89B5] font-bold text-xs uppercase tracking-wider">
+                        Click Here
+                      </Text>
+                      <Text className="text-gray-400 font-medium text-[10px] mt-1">
+                        Upload Photo
+                      </Text>
+                    </>
+                  )}
                 </TouchableOpacity>
               )}
             </View>

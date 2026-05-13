@@ -7,19 +7,19 @@ import "./globals.css";
 
 export default function RootLayout() {
   return (
-    // FIX: This wrapper prevents the blank screen
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <Drawer
-          // FIX: Pass props down to prevent silent React Navigation errors
           drawerContent={() => <SideDrawer />}
+          // FIX: Change this from "initialRoute" to "history"
           backBehavior="history"
+          initialRouteName="dashboard"
           screenOptions={{
             headerShown: false,
             drawerStyle: { width: "80%" },
           }}
         >
-          {/* Your Login Screen (hidden from standard drawer menus) */}
+          {/* Your Login Screen */}
           <Drawer.Screen
             name="index"
             options={{ drawerItemStyle: { display: "none" } }}
@@ -34,7 +34,7 @@ export default function RootLayout() {
           <Drawer.Screen name="payments" />
           <Drawer.Screen name="search" />
 
-          {/* Profile & Match Screens (FIX: Added all missing screens) */}
+          {/* Profile & Match Screens */}
           <Drawer.Screen name="groomprofiles" />
           <Drawer.Screen name="brideprofiles" />
           <Drawer.Screen name="profiledetails" />

@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Dimensions,
-    Image,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -116,10 +116,7 @@ const ProfileDetails = () => {
         style={{ paddingTop: insets.top + 10 }}
         className="bg-white px-6 pb-4 flex-row items-center border-b border-blue-100 shadow-sm"
       >
-        <TouchableOpacity
-          onPress={() => router.replace("/dashboard")}
-          className="mr-4"
-        >
+        <TouchableOpacity onPress={() => router.back()} className="mr-4">
           <Ionicons name="arrow-back" size={24} color="#2D89B5" />
         </TouchableOpacity>
         <Text

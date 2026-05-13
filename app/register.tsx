@@ -2,16 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Dimensions,
-    KeyboardAvoidingView,
-    LayoutAnimation,
-    Platform,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    UIManager,
-    View,
+  Alert,
+  Dimensions,
+  KeyboardAvoidingView,
+  LayoutAnimation,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  UIManager,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import api from "../axios/axiosInterceptor";
@@ -52,15 +52,45 @@ const Register = () => {
 
     setIsSubmitting(true);
     try {
-      await api.post("/auth/send-otp", {
+      const response = await api.post("/auth/send-otp", {
         phoneNumber: phoneNumber,
       });
 
-      // Smoothly animate the transition to the OTP card
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setStep(2);
+      const { verified, message } = response.data;
 
-      Alert.alert("OTP Sent", `An OTP has been sent to +91 ${phoneNumber}`);
+      if (verified) {
+        // If verified is true, show a popup with options to go to Create Profile or Login
+        Alert.alert(
+          "Already Verified",
+          message || "Phone Number Already Verified",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Login",
+              onPress: () => router.replace("/"), // Assuming your index/login page is "/"
+            },
+            {
+              text: "Create Profile",
+              onPress: () =>
+                router.replace({
+                  pathname: "/create-profile",
+                  params: { phoneNumber: phoneNumber },
+                }),
+            },
+          ],
+        );
+      } else {
+        // If verified is false, OTP was sent successfully. Move to Step 2.
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setStep(2);
+        Alert.alert(
+          "OTP Sent",
+          message || `An OTP has been sent to +91 ${phoneNumber}`,
+        );
+      }
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||

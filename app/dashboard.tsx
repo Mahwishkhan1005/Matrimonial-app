@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Href, useRouter } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import { Href, useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useRef } from "react";
 import {
+  Alert,
   Animated,
+  BackHandler,
   Dimensions,
   Easing,
   ImageBackground,
@@ -192,6 +194,30 @@ const Dashboard = () => {
     };
   }, [fadeAnim, slideAnim, scaleAnim, pulseAnim, rotateAnim]);
 
+  // Handle Android Hardware Back Button to exit app from dashboard ONLY when focused
+  useFocusEffect(
+    useCallback(() => {
+      const backAction = () => {
+        Alert.alert("Exit App", "Are you sure you want to exit the app?", [
+          {
+            text: "Cancel",
+            onPress: () => null,
+            style: "cancel",
+          },
+          { text: "YES", onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction,
+      );
+
+      return () => backHandler.remove();
+    }, []),
+  );
+
   const rotateInterpolate = rotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "360deg"],
@@ -202,7 +228,7 @@ const Dashboard = () => {
       label: "Edit Profile",
       icon: "person-outline",
       color: "#2D89B5",
-      route: "/profile",
+      route: "/edit-profile",
     },
     {
       label: "Viewed Contacts",

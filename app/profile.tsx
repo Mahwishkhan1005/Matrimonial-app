@@ -1,17 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Dimensions,
-    Image,
-    Modal,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import api from "../axios/axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 const { width } = Dimensions.get("window");
 
@@ -20,6 +21,23 @@ const Profile = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get("/user/profile");
+      setProfileData(response.data);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -55,7 +73,11 @@ const Profile = () => {
           <View className="relative">
             <View className="w-32 h-32 rounded-full border-4 border-white/30 p-1">
               <Image
-                source={require("../assets/images/groom1.png")}
+                source={
+                  profileData?.images && profileData.images.length > 0
+                    ? { uri: profileData.images[0] }
+                    : require("../assets/images/groom1.png")
+                }
                 className="w-full h-full rounded-full"
                 resizeMode="cover"
               />
@@ -72,7 +94,7 @@ const Profile = () => {
             style={{ fontFamily: "RoyalBold" }}
             className="text-white text-3xl mt-4"
           >
-            {user?.name || "Mahwish Khan"}
+            {profileData?.name || user?.name || "User"}
           </Text>
           <View className="bg-white/20 px-4 py-1 rounded-full mt-2 border border-white/30">
             <Text className="text-white text-[10px] font-bold uppercase tracking-[2px]">

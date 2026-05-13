@@ -2,17 +2,19 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  ActivityIndicator,
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
+import api from "../axios/axiosInterceptor";
 import TopNavBar from "../components/TopNavBar";
 
 // Moved outside to prevent the keyboard from closing on every keystroke
@@ -70,6 +72,7 @@ const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Toggle State for Password Visibility
   const [showCurrent, setShowCurrent] = useState(false);
@@ -80,7 +83,7 @@ const ChangePassword = () => {
     Keyboard.dismiss();
   };
 
-  const handleUpdatePassword = () => {
+  const handleUpdatePassword = async () => {
     dismissKeyboard();
 
     // 1. Check for empty fields
@@ -118,13 +121,36 @@ const ChangePassword = () => {
       return;
     }
 
-    // Success State
-    Alert.alert("Success", "Your password has been successfully updated.", [
-      {
-        text: "OK",
-        onPress: () => router.back(),
-      },
-    ]);
+    setIsSubmitting(true);
+
+    try {
+      // 5. API Call
+      const payload = {
+        oldPassword: currentPassword,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
+      };
+
+      await api.post("/user/resetPassword", payload);
+
+      // Success State
+      Alert.alert("Success", "Your password has been successfully updated.", [
+        {
+          text: "OK",
+          onPress: () => router.back(),
+        },
+      ]);
+    } catch (error: any) {
+      console.error("Update password error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        "Failed to change password. Please check your current password and try again.";
+
+      Alert.alert("Update Failed", errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -197,6 +223,7 @@ const ChangePassword = () => {
                 activeOpacity={0.8}
                 className="flex-1 bg-white h-14 rounded-2xl justify-center items-center border border-blue-100 shadow-sm"
                 onPress={() => router.back()}
+                disabled={isSubmitting}
               >
                 <Text className="text-[#2D89B5] font-black text-sm uppercase tracking-wider">
                   Cancel
@@ -207,15 +234,22 @@ const ChangePassword = () => {
                 activeOpacity={0.8}
                 className="flex-1 bg-[#2D89B5] h-14 rounded-2xl justify-center items-center shadow-md shadow-blue-200 flex-row gap-2"
                 onPress={handleUpdatePassword}
+                disabled={isSubmitting}
               >
-                <Ionicons
-                  name="checkmark-circle-outline"
-                  size={20}
-                  color="#FFF"
-                />
-                <Text className="text-white font-black text-sm tracking-widest uppercase">
-                  Update
-                </Text>
+                {isSubmitting ? (
+                  <ActivityIndicator color="#FFF" size="small" />
+                ) : (
+                  <>
+                    <Ionicons
+                      name="checkmark-circle-outline"
+                      size={20}
+                      color="#FFF"
+                    />
+                    <Text className="text-white font-black text-sm tracking-widest uppercase">
+                      Update
+                    </Text>
+                  </>
+                )}
               </TouchableOpacity>
             </View>
           </ScrollView>
