@@ -21,7 +21,7 @@ const SideDrawer = () => {
 
   const menuItems = [
     { label: "Dashboard", icon: "home-outline", route: "/dashboard" },
-    { label: "About Community", icon: "chatbubbles-outline", route: "/about" },
+
     {
       label: "Initial Details Edit",
       icon: "create-outline",

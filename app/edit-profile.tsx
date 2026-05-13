@@ -44,7 +44,7 @@ const initialFormState = {
   raasi: "Select",
   introduceYourSelf: "",
   nativePlace: "",
-  education: "",
+  education: "Select",
   educationInDetail: "",
   profession: "",
   annualIncome: "",
@@ -329,6 +329,23 @@ const EditProfile = () => {
     familyValues: ["Orthodox", "Traditional", "Moderate", "Liberal"],
     ownHouse: ["Yes", "No"],
     countOptions: ["0", "1", "2", "3", "4", "5", "6"],
+    education: [
+      "BTECH",
+      "MTECH",
+      "DEGREE",
+      "MBA",
+      "MCA",
+      "MBBS",
+      "BDS",
+      "INTERMEDIATE",
+      "DIPLOMA",
+      "PHD",
+      "CA",
+      "IAS",
+      "IPS",
+      "SSC",
+      "OTHER",
+    ],
   };
 
   // Format Helper for ENUMS (UPPER_MIDDLE_CLASS -> Upper Middle Class)
@@ -392,7 +409,7 @@ const EditProfile = () => {
               raasi: formatEnumToLabel(pData.raasi),
               introduceYourSelf: pData.introduceYourSelf || "",
               nativePlace: pData.nativePlace || "",
-              education: pData.education || "",
+              education: pData.education || "Select",
               educationInDetail: pData.educationInDetail || "",
               profession: pData.profession || "",
               annualIncome: pData.annualIncome || "",
@@ -482,6 +499,35 @@ const EditProfile = () => {
   );
 
   const handleUpdateProfile = async () => {
+    // Validation for Enum Fields
+    const mandatoryEnumFields = [
+      { key: "profileCreatedFor", label: "Profile Created For" },
+      { key: "gender", label: "Gender" },
+      { key: "complexion", label: "Complexion" },
+      { key: "maritalStatus", label: "Marital Status" },
+      { key: "star", label: "Star" },
+      { key: "raasi", label: "Raasi" },
+      { key: "education", label: "Education" },
+      { key: "familyType", label: "Family Type" },
+      { key: "familyStatus", label: "Family Status" },
+      { key: "familyValues", label: "Family Values" },
+      { key: "ownHouse", label: "Own House" },
+    ];
+
+    for (const field of mandatoryEnumFields) {
+      if (
+        !formData[field.key as keyof typeof formData] ||
+        formData[field.key as keyof typeof formData] === "Select"
+      ) {
+        Alert.alert(
+          "Selection Required",
+          `Please select a value for ${field.label}`,
+        );
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     try {
       const monthIndex =
@@ -526,7 +572,7 @@ const EditProfile = () => {
         raasi: formatLabelToEnum(formData.raasi),
         introduceYourSelf: formData.introduceYourSelf,
         nativePlace: formData.nativePlace,
-        education: formData.education,
+        education: formData.education === "Select" ? null : formData.education,
         educationInDetail: formData.educationInDetail,
         profession: formData.profession,
         annualIncome: formData.annualIncome,
@@ -715,7 +761,7 @@ const EditProfile = () => {
                 <CustomDropdown
                   label="Profile Created For"
                   value={formData.profileCreatedFor}
-                  required
+                  required={true}
                   options={dropdownOptions.profileCreatedFor}
                   field="profileCreatedFor"
                   icon="people-outline"
@@ -726,7 +772,7 @@ const EditProfile = () => {
                 <CustomDropdown
                   label="Gender"
                   value={formData.gender}
-                  required
+                  required={true}
                   options={dropdownOptions.gender}
                   field="gender"
                   icon="male-female-outline"
@@ -910,12 +956,15 @@ const EditProfile = () => {
 
                 <SectionDivider title="Education & Career" />
 
-                <CustomInput
+                <CustomDropdown
                   label="Education"
                   value={formData.education}
-                  onChangeText={(text: any) => updateField("education", text)}
+                  required={true}
+                  options={dropdownOptions.education}
+                  field="education"
                   icon="school-outline"
-                  placeholder="e.g. B.Tech, M.Sc, MBA"
+                  onSelect={updateField}
+                  insets={insets}
                 />
 
                 <CustomInput
@@ -976,6 +1025,7 @@ const EditProfile = () => {
                 <CustomDropdown
                   label="Complexion"
                   value={formData.complexion}
+                  required={true}
                   options={dropdownOptions.complexion}
                   field="complexion"
                   icon="color-palette-outline"
@@ -986,6 +1036,7 @@ const EditProfile = () => {
                 <CustomDropdown
                   label="Marital Status"
                   value={formData.maritalStatus}
+                  required={true}
                   options={dropdownOptions.maritalStatus}
                   field="maritalStatus"
                   icon="heart-outline"
@@ -1009,6 +1060,7 @@ const EditProfile = () => {
                     <CustomDropdown
                       label="Star / Nakshatra"
                       value={formData.star}
+                      required={true}
                       options={dropdownOptions.star}
                       field="star"
                       icon="star-outline"
@@ -1032,6 +1084,7 @@ const EditProfile = () => {
                     <CustomDropdown
                       label="Raasi"
                       value={formData.raasi}
+                      required={true}
                       options={dropdownOptions.raasi}
                       field="raasi"
                       icon="moon-outline"
@@ -1163,6 +1216,7 @@ const EditProfile = () => {
                 <CustomDropdown
                   label="Family Type"
                   value={formData.familyType}
+                  required={true}
                   options={dropdownOptions.familyType}
                   field="familyType"
                   icon="home-outline"
@@ -1173,6 +1227,7 @@ const EditProfile = () => {
                 <CustomDropdown
                   label="Family Status"
                   value={formData.familyStatus}
+                  required={true}
                   options={dropdownOptions.familyStatus}
                   field="familyStatus"
                   icon="stats-chart-outline"
@@ -1183,6 +1238,7 @@ const EditProfile = () => {
                 <CustomDropdown
                   label="Family Values"
                   value={formData.familyValues}
+                  required={true}
                   options={dropdownOptions.familyValues}
                   field="familyValues"
                   icon="rose-outline"
@@ -1216,6 +1272,7 @@ const EditProfile = () => {
                     <CustomDropdown
                       label="Own House"
                       value={formData.ownHouse}
+                      required={true}
                       options={dropdownOptions.ownHouse}
                       field="ownHouse"
                       icon="home-outline"
