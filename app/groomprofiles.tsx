@@ -124,7 +124,7 @@ const GroomProfiles = () => {
         router.push({ pathname: "/profiledetails", params: { gender: "male" } })
       }
       style={{ width: COLUMN_WIDTH, height: COLUMN_WIDTH * 1.4 }}
-      className="m-1.5 rounded-[20px] overflow-hidden border border-[#C5A059]/10"
+      className="m-1.5 rounded-[24px] overflow-hidden border-2 border-white shadow-xl bg-white"
     >
       <Image
         source={item.image}
@@ -133,7 +133,7 @@ const GroomProfiles = () => {
       />
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.8)"]}
-        className="absolute inset-0 justify-end p-3"
+        className="absolute inset-0 justify-end p-4"
       >
         <Text
           style={{ fontFamily: "RoyalBold" }}
@@ -155,14 +155,14 @@ const GroomProfiles = () => {
         </View>
       </LinearGradient>
 
-      <TouchableOpacity className="absolute bottom-3 right-3 bg-[#C5A059] w-8 h-8 rounded-full items-center justify-center shadow-lg">
-        <Ionicons name="star" size={16} color="white" />
+      <TouchableOpacity className="absolute bottom-3 right-3 bg-[#2D89B5] w-10 h-10 rounded-2xl items-center justify-center shadow-lg shadow-blue-200">
+        <Ionicons name="star" size={20} color="white" />
       </TouchableOpacity>
     </TouchableOpacity>
   );
 
   return (
-    <View className="flex-1 bg-[#010302]">
+    <View className="flex-1 bg-[#F0F7FA]">
       {/* Header */}
       <TopNavBar title="Groom Profiles" />
 

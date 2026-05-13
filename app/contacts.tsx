@@ -62,7 +62,31 @@ const VIEWED_PROFILES = [
   },
 ];
 
-// ✅ Create a separate component for each item
+// Extracted FilterChip to prevent re-renders
+const FilterChip = ({
+  label,
+  value,
+  selectedFilter,
+  setSelectedFilter,
+}: any) => (
+  <TouchableOpacity
+    onPress={() => setSelectedFilter(value)}
+    className={`px-4 py-2 rounded-full ${
+      selectedFilter === value
+        ? "bg-[#2D89B5] border border-[#2D89B5]"
+        : "bg-white border border-blue-100 shadow-sm shadow-blue-50"
+    }`}
+  >
+    <Text
+      className={`${
+        selectedFilter === value ? "text-white" : "text-[#2D89B5]"
+      } text-xs font-bold`}
+    >
+      {label}
+    </Text>
+  </TouchableOpacity>
+);
+
 const ProfileCard = ({
   item,
   index,
@@ -102,7 +126,7 @@ const ProfileCard = ({
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => console.log("Navigate to profile", item.id)}
-        className="m-1.5 rounded-[20px] overflow-hidden border border-[#C5A059]/20 bg-[#0B2B1F] shadow-lg"
+        className="m-1.5 rounded-[20px] overflow-hidden border border-blue-50 bg-white shadow-md shadow-blue-100"
       >
         <View style={{ height: COLUMN_WIDTH * 1.3, position: "relative" }}>
           <Image
@@ -121,48 +145,50 @@ const ProfileCard = ({
               {item.name}
             </Text>
             <View className="flex-row items-center mt-1">
-              <Ionicons name="location-outline" size={12} color="#C5A059" />
-              <Text className="text-white/70 text-[10px] ml-1">
+              <Ionicons name="location-outline" size={12} color="#2D89B5" />
+              <Text className="text-white/90 text-[10px] ml-1 font-medium">
                 {item.location}
               </Text>
-              <View className="w-1 h-1 rounded-full bg-white/40 mx-2" />
-              <Text className="text-white/70 text-[10px]">{item.age} Yrs</Text>
+              <View className="w-1 h-1 rounded-full bg-white/60 mx-2" />
+              <Text className="text-white/90 text-[10px] font-medium">
+                {item.age} Yrs
+              </Text>
             </View>
             <View className="flex-row items-center mt-1">
-              <Ionicons name="briefcase-outline" size={10} color="#C5A059" />
-              <Text className="text-white/60 text-[9px] ml-1">
+              <Ionicons name="briefcase-outline" size={10} color="#2D89B5" />
+              <Text className="text-white/80 text-[9px] ml-1 font-medium">
                 {item.occupation}
               </Text>
             </View>
           </LinearGradient>
 
-          {/* Status Badge */}
-          <View className="absolute top-3 left-3 bg-[#C5A059]/90 px-2 py-1 rounded-full flex-row items-center">
-            <Ionicons name="time-outline" size={10} color="#0B2B1F" />
-            <Text className="text-[#0B2B1F] text-[8px] font-bold ml-1">
+          {/* Status Badge - Pink Accent */}
+          <View className="absolute top-3 left-3 bg-[#E91E63]/95 px-2 py-1 rounded-full flex-row items-center shadow-sm">
+            <Ionicons name="time-outline" size={10} color="#FFF" />
+            <Text className="text-white text-[8px] font-black tracking-wider ml-1">
               {item.status.toUpperCase()}
             </Text>
           </View>
         </View>
 
         {/* Bottom Action Buttons */}
-        <View className="flex-row justify-between p-3 border-t border-[#C5A059]/10">
+        <View className="flex-row justify-between p-3 border-t border-blue-50 bg-blue-50/30">
           <TouchableOpacity
             className="flex-1 flex-row items-center justify-center gap-1"
             onPress={() => console.log("Send interest", item.id)}
           >
-            <Ionicons name="heart" size={16} color="#C5A059" />
-            <Text className="text-[#C5A059] text-[10px] font-bold">
+            <Ionicons name="heart" size={16} color="#E91E63" />
+            <Text className="text-[#E91E63] text-[10px] font-bold uppercase">
               Interest
             </Text>
           </TouchableOpacity>
-          <View className="w-[1px] h-6 bg-[#C5A059]/20" />
+          <View className="w-[1px] h-6 bg-blue-100" />
           <TouchableOpacity
             className="flex-1 flex-row items-center justify-center gap-1"
             onPress={() => console.log("Contact", item.id)}
           >
-            <Ionicons name="chatbubble-outline" size={16} color="#C5A059" />
-            <Text className="text-[#C5A059] text-[10px] font-bold">
+            <Ionicons name="chatbubble-outline" size={16} color="#2D89B5" />
+            <Text className="text-[#2D89B5] text-[10px] font-bold uppercase">
               Message
             </Text>
           </TouchableOpacity>
@@ -199,48 +225,35 @@ const Contacts = () => {
     interest: 3,
   };
 
-  const FilterChip = ({ label, value }: { label: string; value: string }) => (
-    <TouchableOpacity
-      onPress={() => setSelectedFilter(value)}
-      className={`px-4 py-2 rounded-full ${selectedFilter === value ? "bg-[#C5A059]" : "bg-[#0B2B1F] border border-[#C5A059]/30"}`}
-    >
-      <Text
-        className={`${selectedFilter === value ? "text-[#0B2B1F]" : "text-white"} text-xs font-bold`}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <View className="flex-1 bg-[#010302]">
+    <View className="flex-1 bg-[#F0F7FA]">
       {/* Header */}
-      <View className="bg-gradient-to-r from-[#0B2B1F] to-[#0D3325] px-6 pb-4 border-b border-[#C5A059]/20">
+      <View className="bg-white px-6 pb-4 border-b border-blue-100 shadow-sm z-10">
         <TopNavBar title="Viewed Contacts" />
 
         {/* Stats Cards */}
         <View className="flex-row justify-between mt-4 gap-3">
-          <View className="flex-1 bg-[#0B2B1F]/60 rounded-xl p-3 border border-[#C5A059]/20">
-            <Text className="text-white/50 text-[10px] uppercase tracking-wider">
+          <View className="flex-1 bg-white rounded-xl p-3 border border-blue-50 shadow-sm shadow-blue-100 items-center">
+            <Text className="text-gray-400 text-[9px] font-bold uppercase tracking-wider">
               Total Views
             </Text>
-            <Text className="text-[#C5A059] text-2xl font-bold mt-1">
+            <Text className="text-[#2D89B5] text-2xl font-black mt-1">
               {stats.total}
             </Text>
           </View>
-          <View className="flex-1 bg-[#0B2B1F]/60 rounded-xl p-3 border border-[#C5A059]/20">
-            <Text className="text-white/50 text-[10px] uppercase tracking-wider">
+          <View className="flex-1 bg-white rounded-xl p-3 border border-blue-50 shadow-sm shadow-blue-100 items-center">
+            <Text className="text-gray-400 text-[9px] font-bold uppercase tracking-wider">
               Today
             </Text>
-            <Text className="text-[#C5A059] text-2xl font-bold mt-1">
+            <Text className="text-[#2D89B5] text-2xl font-black mt-1">
               {stats.today}
             </Text>
           </View>
-          <View className="flex-1 bg-[#0B2B1F]/60 rounded-xl p-3 border border-[#C5A059]/20">
-            <Text className="text-white/50 text-[10px] uppercase tracking-wider">
+          <View className="flex-1 bg-white rounded-xl p-3 border border-pink-50 shadow-sm shadow-pink-100 items-center">
+            <Text className="text-gray-400 text-[9px] font-bold uppercase tracking-wider">
               Interests
             </Text>
-            <Text className="text-[#C5A059] text-2xl font-bold mt-1">
+            <Text className="text-[#E91E63] text-2xl font-black mt-1">
               {stats.interest}
             </Text>
           </View>
@@ -248,9 +261,24 @@ const Contacts = () => {
 
         {/* Filter Chips */}
         <View className="flex-row gap-2 mt-4">
-          <FilterChip label="All" value="all" />
-          <FilterChip label="Recent" value="recent" />
-          <FilterChip label="Oldest" value="oldest" />
+          <FilterChip
+            label="All"
+            value="all"
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
+          />
+          <FilterChip
+            label="Recent"
+            value="recent"
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
+          />
+          <FilterChip
+            label="Oldest"
+            value="oldest"
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
+          />
         </View>
       </View>
 
@@ -268,31 +296,31 @@ const Contacts = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#C5A059"
-              colors={["#C5A059"]}
+              tintColor="#2D89B5"
+              colors={["#2D89B5"]}
             />
           }
           ListHeaderComponent={() => (
             <View className="mb-2">
-              <Text className="text-white/50 text-xs ml-2">
+              <Text className="text-gray-500 font-medium text-xs ml-2">
                 {VIEWED_PROFILES.length} profiles found
               </Text>
             </View>
           )}
           ListEmptyComponent={() => (
             <View className="flex-1 justify-center items-center mt-20">
-              <View className="bg-[#C5A059]/10 p-6 rounded-full">
+              <View className="bg-blue-50 p-6 rounded-full shadow-sm">
                 <Ionicons
                   name="heart-dislike-outline"
                   size={64}
-                  color="#C5A059"
-                  opacity={0.5}
+                  color="#2D89B5"
+                  opacity={0.8}
                 />
               </View>
-              <Text className="text-white/50 mt-4 text-center font-bold text-base">
+              <Text className="text-[#2D89B5] mt-4 text-center font-bold text-base">
                 No viewed contacts yet
               </Text>
-              <Text className="text-white/30 text-center text-xs mt-2">
+              <Text className="text-gray-400 text-center font-medium text-xs mt-2">
                 Profiles you view will appear here
               </Text>
             </View>

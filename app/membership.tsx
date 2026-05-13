@@ -26,7 +26,7 @@ const PLANS = [
       "Send 50 Interests",
       "Direct Message Support",
     ],
-    color: "#C0C0C0",
+    color: "#64748B", // Slate Gray
     icon: "shield-outline",
   },
   {
@@ -40,7 +40,7 @@ const PLANS = [
       "Featured Profile",
       "Priority Support",
     ],
-    color: "#FFD700",
+    color: "#E91E63", // Accent Pink
     icon: "star-outline",
     popular: true,
   },
@@ -55,7 +55,7 @@ const PLANS = [
       "Verified Badge",
       "Profile Booster",
     ],
-    color: "#B9F2FF",
+    color: "#2D89B5", // Primary Blue
     icon: "diamond-outline",
   },
 ];
@@ -81,12 +81,12 @@ const Membership = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#010302]">
+    <View className="flex-1 bg-[#F0F7FA]">
       {/* Header */}
       <TopNavBar title="Membership Plans" />
 
       <ScrollView className="flex-1 p-6" showsVerticalScrollIndicator={false}>
-        <Text className="text-white/60 text-center mb-8 text-sm">
+        <Text className="text-gray-500 font-medium text-center mb-8 text-sm">
           Choose a plan that fits your journey to find the eternal partner
         </Text>
 
@@ -95,15 +95,17 @@ const Membership = () => {
             key={plan.id}
             activeOpacity={0.9}
             onPress={() => handlePlanSelect(plan)}
-            className="mb-6"
+            className="mb-6 shadow-lg shadow-blue-100"
           >
             <LinearGradient
-              colors={["#0B2B1F", "#05150F"]}
-              className="rounded-3xl p-6 border border-[#C5A059]/20 overflow-hidden"
+              colors={["#FFFFFF", "#F4F9FA"]}
+              className={`rounded-3xl p-6 border ${
+                plan.popular ? "border-[#E91E63]" : "border-blue-100"
+              } overflow-hidden`}
             >
               {plan.popular && (
-                <View className="absolute top-0 right-0 bg-[#C5A059] px-4 py-1 rounded-bl-2xl">
-                  <Text className="text-black text-[10px] font-bold uppercase">
+                <View className="absolute top-0 right-0 bg-[#E91E63] px-4 py-1 rounded-bl-2xl shadow-sm shadow-pink-200">
+                  <Text className="text-white text-[10px] font-black tracking-wider uppercase">
                     Popular
                   </Text>
                 </View>
@@ -119,42 +121,48 @@ const Membership = () => {
                     />
                     <Text
                       style={{ fontFamily: "RoyalBold" }}
-                      className="text-white text-xl ml-2"
+                      className="text-[#2D89B5] text-xl ml-2"
                     >
                       {plan.name}
                     </Text>
                   </View>
-                  <Text className="text-[#C5A059] text-sm font-bold">
+                  <Text className="text-[#E91E63] text-sm font-bold">
                     {plan.duration}
                   </Text>
                 </View>
                 <View className="items-end">
                   <Text
                     style={{ fontFamily: "RoyalBold" }}
-                    className="text-white text-2xl"
+                    className="text-[#333] text-2xl"
                   >
                     {plan.price}
                   </Text>
-                  <Text className="text-white/40 text-[10px]">
+                  <Text className="text-gray-400 font-medium text-[10px]">
                     Tax Included
                   </Text>
                 </View>
               </View>
 
-              <View className="h-[1px] bg-[#C5A059]/10 my-4" />
+              <View className="h-[1px] bg-blue-50 my-4" />
 
               {plan.features.map((feature, idx) => (
                 <View key={idx} className="flex-row items-center mb-2">
-                  <Ionicons name="checkmark-circle" size={16} color="#C5A059" />
-                  <Text className="text-white/80 text-sm ml-2">{feature}</Text>
+                  <Ionicons name="checkmark-circle" size={16} color="#2D89B5" />
+                  <Text className="text-gray-700 font-medium text-sm ml-2">
+                    {feature}
+                  </Text>
                 </View>
               ))}
 
               <TouchableOpacity
                 onPress={() => handlePlanSelect(plan)}
-                className="mt-6 bg-[#C5A059] py-3 rounded-2xl items-center"
+                className={`mt-6 py-3 rounded-2xl items-center shadow-md ${
+                  plan.popular
+                    ? "bg-[#E91E63] shadow-pink-200"
+                    : "bg-[#2D89B5] shadow-blue-200"
+                }`}
               >
-                <Text className="text-black font-bold uppercase tracking-wider">
+                <Text className="text-white font-black uppercase tracking-widest">
                   Select Plan
                 </Text>
               </TouchableOpacity>
@@ -171,39 +179,39 @@ const Membership = () => {
         animationType="slide"
         onRequestClose={() => setShowPayment(false)}
       >
-        <View className="flex-1 justify-end bg-black/80">
-          <View className="bg-[#0B2B1F] rounded-t-[40px] p-8 border-t border-[#C5A059]/30">
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white rounded-t-[40px] p-8 shadow-2xl">
             <View className="flex-row justify-between items-center mb-6">
               <View>
-                <Text className="text-white/60 text-xs uppercase tracking-widest">
+                <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest">
                   Confirm Payment
                 </Text>
                 <Text
                   style={{ fontFamily: "RoyalBold" }}
-                  className="text-white text-2xl"
+                  className="text-[#2D89B5] text-2xl"
                 >
                   {selectedPlan?.name}
                 </Text>
               </View>
               <TouchableOpacity
                 onPress={() => setShowPayment(false)}
-                className="bg-white/10 p-2 rounded-full"
+                className="bg-blue-50 p-2 rounded-full"
               >
-                <Ionicons name="close" size={20} color="#C5A059" />
+                <Ionicons name="close" size={20} color="#2D89B5" />
               </TouchableOpacity>
             </View>
 
-            <View className="bg-black/40 p-4 rounded-2xl mb-8 flex-row justify-between items-center border border-[#C5A059]/10">
-              <Text className="text-white/80">Total Amount</Text>
+            <View className="bg-blue-50/50 p-4 rounded-2xl mb-8 flex-row justify-between items-center border border-blue-100">
+              <Text className="text-gray-600 font-bold">Total Amount</Text>
               <Text
                 style={{ fontFamily: "RoyalBold" }}
-                className="text-[#C5A059] text-xl"
+                className="text-[#E91E63] text-xl"
               >
                 {selectedPlan?.price}
               </Text>
             </View>
 
-            <Text className="text-white/60 text-xs mb-4 uppercase tracking-widest">
+            <Text className="text-gray-400 font-bold text-xs mb-4 uppercase tracking-widest">
               Select Payment Method
             </Text>
 
@@ -214,23 +222,23 @@ const Membership = () => {
                   setShowPayment(false);
                   alert(`Proceeding with ${method.name}`);
                 }}
-                className="flex-row items-center bg-black/20 p-4 rounded-2xl mb-3 border border-[#C5A059]/10"
+                className="flex-row items-center bg-white p-4 rounded-2xl mb-3 border border-blue-100 shadow-sm shadow-blue-50"
               >
-                <View className="bg-[#C5A059]/10 p-2 rounded-xl">
+                <View className="bg-[#2D89B5]/10 p-2 rounded-xl">
                   <Ionicons
                     name={method.icon as any}
                     size={20}
-                    color="#C5A059"
+                    color="#2D89B5"
                   />
                 </View>
-                <Text className="text-white text-sm ml-4 flex-1">
+                <Text className="text-[#333] font-bold text-sm ml-4 flex-1">
                   {method.name}
                 </Text>
-                <Ionicons name="chevron-forward" size={16} color="#C5A059" />
+                <Ionicons name="chevron-forward" size={16} color="#2D89B5" />
               </TouchableOpacity>
             ))}
 
-            <Text className="text-white/30 text-[10px] text-center mt-6">
+            <Text className="text-gray-400 font-medium text-[10px] text-center mt-6">
               By proceeding, you agree to our Terms of Service and Privacy
               Policy. Secure encrypted payment processing.
             </Text>

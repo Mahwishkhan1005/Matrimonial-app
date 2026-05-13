@@ -40,10 +40,167 @@ const initialFormState = {
   padam: "",
   raasi: "Select",
 };
+
+// 1. MOVED OUTSIDE: CustomInput
+const CustomInput = ({
+  label,
+  value,
+  onChangeText,
+  required = false,
+  icon,
+  placeholder,
+  keyboardType,
+}: any) => {
+  return (
+    <View className="mb-5">
+      <View className="mb-2 ml-1 flex-row">
+        <Text className="text-[#2D89B5] text-xs font-RoyalBold">{label}</Text>
+        {required && <Text className="text-[#E91E63] font-bold ml-1">*</Text>}
+      </View>
+      <View className="flex-row items-center bg-blue-50/50 rounded-2xl border border-blue-100 overflow-hidden h-14">
+        <View className="w-12 h-full justify-center items-center bg-[#2D89B5]/10">
+          <Ionicons name={icon} size={20} color="#2D89B5" />
+        </View>
+        <TextInput
+          className="flex-1 text-[#333] text-base px-3 font-medium"
+          style={
+            Platform.OS === "android"
+              ? { paddingVertical: 0, includeFontPadding: false }
+              : {}
+          }
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor="rgba(45, 137, 181, 0.4)"
+          keyboardType={keyboardType}
+        />
+      </View>
+    </View>
+  );
+};
+
+// 2. MOVED OUTSIDE: CustomDropdown
+const CustomDropdown = ({
+  label,
+  value,
+  required = false,
+  options,
+  field,
+  icon,
+  onSelect,
+  insets,
+}: any) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <View className="mb-5">
+      {label && (
+        <View className="mb-2 ml-1 flex-row">
+          <Text className="text-[#2D89B5] text-xs font-RoyalBold">{label}</Text>
+          {required && <Text className="text-[#E91E63] font-bold ml-1">*</Text>}
+        </View>
+      )}
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => {
+          Keyboard.dismiss();
+          setIsOpen(true);
+        }}
+        className="bg-blue-50/50 rounded-2xl border border-blue-100 overflow-hidden h-14"
+      >
+        <View className="flex-row items-center h-full">
+          <View className="w-12 h-full justify-center items-center bg-[#2D89B5]/10">
+            <Ionicons name={icon} size={20} color="#2D89B5" />
+          </View>
+          <View className="flex-1 flex-row justify-between items-center px-4">
+            <Text
+              className={`text-base font-medium ${
+                value === "Select" ||
+                value === "DD" ||
+                value === "MMM" ||
+                value === "YYYY" ||
+                value === "HH" ||
+                value === "MM" ||
+                value === "AM/PM"
+                  ? "text-gray-400"
+                  : "text-[#333]"
+              }`}
+            >
+              {value}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color="#2D89B5" />
+          </View>
+        </View>
+      </TouchableOpacity>
+
+      <Modal
+        visible={isOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsOpen(false)}
+        statusBarTranslucent={true}
+      >
+        <TouchableOpacity
+          className="flex-1 bg-black/60"
+          activeOpacity={1}
+          onPress={() => setIsOpen(false)}
+        >
+          <View className="flex-1 justify-end">
+            <Animated.View
+              className="bg-white rounded-t-3xl max-h-[60%] shadow-2xl"
+              style={{ paddingBottom: Math.max(insets?.bottom || 0, 16) }}
+            >
+              <View className="p-4 border-b border-blue-50 flex-row justify-between items-center">
+                <Text className="text-[#2D89B5] text-lg font-RoyalBold uppercase tracking-wider">
+                  Select {label || field}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setIsOpen(false)}
+                  className="bg-blue-50 p-2 rounded-full"
+                >
+                  <Ionicons name="close" size={20} color="#2D89B5" />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={options}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    className="p-4 border-b border-blue-50"
+                    onPress={() => {
+                      onSelect(field, item);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <Text className="text-[#333] text-base font-medium">
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                showsVerticalScrollIndicator={false}
+              />
+            </Animated.View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+};
+
+// 3. MOVED OUTSIDE: SectionDivider
+const SectionDivider = ({ title }: any) => (
+  <View className="flex-row items-center my-6">
+    <View className="flex-1 h-[1px] bg-[#2D89B5]/20" />
+    <Text className="text-[#E91E63] text-xs font-RoyalBold mx-4 uppercase tracking-wider">
+      {title}
+    </Text>
+    <View className="flex-1 h-[1px] bg-[#2D89B5]/20" />
+  </View>
+);
+
 const EditProfile = () => {
   const router = useRouter();
-  const insets = useSafeAreaInsets(); // <-- ADDED: Detects safe area limits (notches, nav bars)
-  const [showDropdown, setShowDropdown] = useState(null);
+  const insets = useSafeAreaInsets();
   const [activeField, setActiveField] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -182,172 +339,20 @@ const EditProfile = () => {
 
   const updateField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    setShowDropdown(null);
   };
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
-  const CustomInput = ({
-    label,
-    value,
-    onChangeText,
-    required = false,
-    icon,
-    placeholder,
-    keyboardType,
-  }: any) => {
-    return (
-      <View className="mb-5">
-        <View className="mb-2 ml-1 flex-row">
-          <Text className="text-[#C5A059] text-xs font-RoyalBold">{label}</Text>
-          {required && <Text className="text-red-500 font-bold ml-1">*</Text>}
-        </View>
-        <View className="flex-row items-center bg-white/5 rounded-2xl border border-[#C5A059]/20 overflow-hidden h-14">
-          <View className="w-12 h-full justify-center items-center bg-[#C5A059]/10">
-            <Ionicons name={icon} size={20} color="#C5A059" />
-          </View>
-          <TextInput
-            className="flex-1 text-white text-base px-3"
-            style={
-              Platform.OS === "android"
-                ? { paddingVertical: 0, includeFontPadding: false }
-                : {}
-            }
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            placeholderTextColor="rgba(255, 255, 255, 0.3)"
-            keyboardType={keyboardType}
-          />
-        </View>
-      </View>
-    );
-  };
-
-  const CustomDropdown = ({
-    label,
-    value,
-    required = false,
-    options,
-    field,
-    icon,
-  }: any) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-      <View className="mb-5">
-        {label && (
-          <View className="mb-2 ml-1 flex-row">
-            <Text className="text-[#C5A059] text-xs font-RoyalBold">
-              {label}
-            </Text>
-            {required && <Text className="text-red-500 font-bold ml-1">*</Text>}
-          </View>
-        )}
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => {
-            dismissKeyboard();
-            setIsOpen(true);
-          }}
-          className="bg-white/5 rounded-2xl border border-[#C5A059]/20 overflow-hidden h-14"
-        >
-          <View className="flex-row items-center h-full">
-            <View className="w-12 h-full justify-center items-center bg-[#C5A059]/10">
-              <Ionicons name={icon} size={20} color="#C5A059" />
-            </View>
-            <View className="flex-1 flex-row justify-between items-center px-4">
-              <Text
-                className={`text-base ${
-                  value === "Select" ||
-                  value === "DD" ||
-                  value === "MMM" ||
-                  value === "YYYY" ||
-                  value === "HH" ||
-                  value === "MM" ||
-                  value === "AM/PM"
-                    ? "text-white/40"
-                    : "text-white"
-                }`}
-              >
-                {value}
-              </Text>
-              <Ionicons name="chevron-down" size={20} color="#C5A059" />
-            </View>
-          </View>
-        </TouchableOpacity>
-
-        <Modal
-          visible={isOpen}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setIsOpen(false)}
-          statusBarTranslucent={true}
-        >
-          <TouchableOpacity
-            className="flex-1 bg-black/80"
-            activeOpacity={1}
-            onPress={() => setIsOpen(false)}
-          >
-            <View className="flex-1 justify-end">
-              <Animated.View
-                className="bg-[#12402D] rounded-t-3xl max-h-[60%]"
-                // <-- ADDED: Applies dynamic padding for the bottom Android navigation bar
-                style={{ paddingBottom: Math.max(insets.bottom, 16) }}
-              >
-                <View className="p-4 border-b border-[#C5A059]/20 flex-row justify-between items-center">
-                  <Text className="text-[#C5A059] text-lg font-RoyalBold uppercase tracking-wider">
-                    Select {label || field}
-                  </Text>
-                  <TouchableOpacity onPress={() => setIsOpen(false)}>
-                    <Ionicons name="close" size={24} color="#C5A059" />
-                  </TouchableOpacity>
-                </View>
-                <FlatList
-                  data={options}
-                  keyExtractor={(item) => item}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      className="p-4 border-b border-[#C5A059]/10"
-                      onPress={() => {
-                        updateField(field, item);
-                        setIsOpen(false);
-                      }}
-                    >
-                      <Text className="text-white text-base">{item}</Text>
-                    </TouchableOpacity>
-                  )}
-                  showsVerticalScrollIndicator={false}
-                />
-              </Animated.View>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-      </View>
-    );
-  };
-
-  const SectionDivider = ({ title }: any) => (
-    <View className="flex-row items-center my-6">
-      <View className="flex-1 h-[1px] bg-[#C5A059]/20" />
-      <Text className="text-[#C5A059] text-xs font-RoyalBold mx-4 uppercase tracking-wider">
-        {title}
-      </Text>
-      <View className="flex-1 h-[1px] bg-[#C5A059]/20" />
-    </View>
-  );
-
   return (
-    <View className="flex-1 bg-[#0B2B1F]">
+    <View className="flex-1 bg-[#F0F7FA]">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
-        {/* Gradient Header */}
-        <TopNavBar title="Edit Profile" showBack={true} />
+        <TopNavBar title="Edit Profile" />
 
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
           <ScrollView
@@ -364,26 +369,26 @@ const EditProfile = () => {
               }}
             >
               {/* Profile Completion Card */}
-              <View className="bg-gradient-to-r from-[#12402D] to-[#0D3325] p-5 rounded-3xl border border-[#C5A059]/20 mt-4 mb-6 shadow-xl">
+              <View className="bg-white p-5 rounded-3xl border border-blue-50 mt-4 mb-6 shadow-md shadow-blue-100">
                 <View className="flex-row justify-between items-center mb-3">
-                  <Text className="text-white text-sm font-RoyalBold">
+                  <Text className="text-[#2D89B5] text-sm font-RoyalBold">
                     Profile Completion
                   </Text>
-                  <Text className="text-[#C5A059] text-xs font-bold">30%</Text>
+                  <Text className="text-[#E91E63] text-xs font-bold">30%</Text>
                 </View>
-                <View className="h-2 bg-[#0B2B1F] rounded-full overflow-hidden">
+                <View className="h-2 bg-blue-50 rounded-full overflow-hidden">
                   <Animated.View
-                    className="h-full bg-[#C5A059] rounded-full"
+                    className="h-full bg-[#E91E63] rounded-full"
                     style={{ width: "30%" }}
                   />
                 </View>
-                <Text className="text-white/50 text-xs mt-3">
+                <Text className="text-gray-500 font-medium text-xs mt-3">
                   Complete your profile to get better matches
                 </Text>
               </View>
 
               {/* Main Form Card */}
-              <View className="bg-[#12402D]/40 p-6 rounded-[30px] border border-[#C5A059]/20 mb-8 shadow-lg">
+              <View className="bg-white p-6 rounded-[30px] border border-blue-50 mb-8 shadow-lg shadow-blue-100">
                 <SectionDivider title="Basic Information" />
 
                 <CustomInput
@@ -421,6 +426,8 @@ const EditProfile = () => {
                   options={dropdownOptions.profileCreatedFor}
                   field="profileCreatedFor"
                   icon="people-outline"
+                  onSelect={updateField}
+                  insets={insets}
                 />
 
                 <CustomDropdown
@@ -430,12 +437,14 @@ const EditProfile = () => {
                   options={dropdownOptions.gender}
                   field="gender"
                   icon="male-female-outline"
+                  onSelect={updateField}
+                  insets={insets}
                 />
 
                 <SectionDivider title="Birth Details" />
 
                 {/* Date of Birth Row */}
-                <Text className="text-[#C5A059] text-xs font-RoyalBold mb-2 ml-1">
+                <Text className="text-[#2D89B5] text-xs font-RoyalBold mb-2 ml-1">
                   Date of Birth
                 </Text>
                 <View className="flex-row justify-between gap-3 mb-5">
@@ -445,6 +454,8 @@ const EditProfile = () => {
                       options={dropdownOptions.dobDay}
                       field="dobDay"
                       icon="calendar-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                   <View className="flex-1">
@@ -453,6 +464,8 @@ const EditProfile = () => {
                       options={dropdownOptions.dobMonth}
                       field="dobMonth"
                       icon="calendar-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                   <View className="flex-1">
@@ -461,12 +474,14 @@ const EditProfile = () => {
                       options={dropdownOptions.dobYear}
                       field="dobYear"
                       icon="calendar-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                 </View>
 
                 {/* Time of Birth Row */}
-                <Text className="text-[#C5A059] text-xs font-RoyalBold mb-2 ml-1">
+                <Text className="text-[#2D89B5] text-xs font-RoyalBold mb-2 ml-1">
                   Time of Birth
                 </Text>
                 <View className="flex-row justify-between gap-3 mb-5">
@@ -476,6 +491,8 @@ const EditProfile = () => {
                       options={dropdownOptions.tobHour}
                       field="tobHour"
                       icon="time-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                   <View className="flex-1">
@@ -484,6 +501,8 @@ const EditProfile = () => {
                       options={dropdownOptions.tobMinute}
                       field="tobMinute"
                       icon="time-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                   <View className="flex-1">
@@ -492,6 +511,8 @@ const EditProfile = () => {
                       options={dropdownOptions.tobAmPm}
                       field="tobAmPm"
                       icon="time-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                 </View>
@@ -514,6 +535,8 @@ const EditProfile = () => {
                       options={dropdownOptions.height}
                       field="height"
                       icon="resize-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                   <View className="flex-1">
@@ -523,6 +546,8 @@ const EditProfile = () => {
                       options={dropdownOptions.weight}
                       field="weight"
                       icon="fitness-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                 </View>
@@ -533,6 +558,8 @@ const EditProfile = () => {
                   options={dropdownOptions.complexion}
                   field="complexion"
                   icon="color-palette-outline"
+                  onSelect={updateField}
+                  insets={insets}
                 />
 
                 <CustomDropdown
@@ -541,6 +568,8 @@ const EditProfile = () => {
                   options={dropdownOptions.maritalStatus}
                   field="maritalStatus"
                   icon="heart-outline"
+                  onSelect={updateField}
+                  insets={insets}
                 />
 
                 <SectionDivider title="Astrological Details" />
@@ -562,6 +591,8 @@ const EditProfile = () => {
                       options={dropdownOptions.star}
                       field="star"
                       icon="star-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                 </View>
@@ -583,6 +614,8 @@ const EditProfile = () => {
                       options={dropdownOptions.raasi}
                       field="raasi"
                       icon="moon-outline"
+                      onSelect={updateField}
+                      insets={insets}
                     />
                   </View>
                 </View>
@@ -592,21 +625,21 @@ const EditProfile = () => {
               <View className="flex-row gap-4 mb-6">
                 <TouchableOpacity
                   activeOpacity={0.8}
-                  className="flex-1 bg-white/10 h-14 rounded-2xl justify-center items-center border border-[#C5A059]/20"
+                  className="flex-1 bg-white h-14 rounded-2xl justify-center items-center border border-blue-100 shadow-sm"
                   onPress={() => router.back()}
                 >
-                  <Text className="text-white font-bold text-sm uppercase tracking-wider">
+                  <Text className="text-[#2D89B5] font-black text-sm uppercase tracking-wider">
                     Cancel
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   activeOpacity={0.8}
-                  className="flex-1 bg-[#C5A059] h-14 rounded-2xl justify-center items-center shadow-lg flex-row gap-2"
+                  className="flex-1 bg-[#2D89B5] h-14 rounded-2xl justify-center items-center shadow-md shadow-blue-200 flex-row gap-2"
                   onPress={() => console.log("Form Data:", formData)}
                 >
-                  <Ionicons name="save-outline" size={20} color="#0B2B1F" />
-                  <Text className="text-[#0B2B1F] font-extrabold text-sm tracking-widest uppercase">
+                  <Ionicons name="save-outline" size={20} color="#FFF" />
+                  <Text className="text-white font-extrabold text-sm tracking-widest uppercase">
                     Save Details
                   </Text>
                 </TouchableOpacity>
@@ -614,10 +647,10 @@ const EditProfile = () => {
 
               {/* Progress Indicator */}
               <View className="flex-row justify-center gap-2 mb-8">
-                <View className="w-2 h-2 rounded-full bg-[#C5A059]"></View>
-                <View className="w-2 h-2 rounded-full bg-[#C5A059]/30"></View>
-                <View className="w-2 h-2 rounded-full bg-[#C5A059]/30"></View>
-                <View className="w-2 h-2 rounded-full bg-[#C5A059]/30"></View>
+                <View className="w-2 h-2 rounded-full bg-[#2D89B5]"></View>
+                <View className="w-2 h-2 rounded-full bg-blue-200"></View>
+                <View className="w-2 h-2 rounded-full bg-blue-200"></View>
+                <View className="w-2 h-2 rounded-full bg-blue-200"></View>
               </View>
             </Animated.View>
           </ScrollView>

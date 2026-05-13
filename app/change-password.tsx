@@ -15,6 +15,54 @@ import {
 } from "react-native";
 import TopNavBar from "../components/TopNavBar";
 
+// Moved outside to prevent the keyboard from closing on every keystroke
+const PasswordInput = ({
+  label,
+  value,
+  onChangeText,
+  showPassword,
+  setShowPassword,
+  placeholder,
+}: any) => {
+  return (
+    <View className="mb-5">
+      <View className="mb-2 ml-1 flex-row">
+        <Text className="text-[#2D89B5] text-xs font-RoyalBold">{label}</Text>
+        <Text className="text-[#E91E63] font-bold ml-1">*</Text>
+      </View>
+      <View className="flex-row items-center bg-blue-50/50 rounded-2xl border border-blue-100 overflow-hidden h-14">
+        <View className="w-12 h-full justify-center items-center bg-[#2D89B5]/10">
+          <Ionicons name="lock-closed-outline" size={20} color="#2D89B5" />
+        </View>
+        <TextInput
+          className="flex-1 text-[#333] text-base px-3 font-medium"
+          style={
+            Platform.OS === "android"
+              ? { paddingVertical: 0, includeFontPadding: false }
+              : {}
+          }
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor="rgba(45, 137, 181, 0.4)"
+          secureTextEntry={!showPassword}
+          autoCapitalize="none"
+        />
+        <TouchableOpacity
+          className="h-full justify-center px-4"
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Ionicons
+            name={showPassword ? "eye-outline" : "eye-off-outline"}
+            size={20}
+            color="#2D89B5"
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 const ChangePassword = () => {
   const router = useRouter();
 
@@ -79,56 +127,8 @@ const ChangePassword = () => {
     ]);
   };
 
-  // Reusable Component for Password Inputs to keep code clean
-  const PasswordInput = ({
-    label,
-    value,
-    onChangeText,
-    showPassword,
-    setShowPassword,
-    placeholder,
-  }: any) => {
-    return (
-      <View className="mb-5">
-        <View className="mb-2 ml-1 flex-row">
-          <Text className="text-[#C5A059] text-xs font-RoyalBold">{label}</Text>
-          <Text className="text-red-500 font-bold ml-1">*</Text>
-        </View>
-        <View className="flex-row items-center bg-white/5 rounded-2xl border border-[#C5A059]/20 overflow-hidden h-14">
-          <View className="w-12 h-full justify-center items-center bg-[#C5A059]/10">
-            <Ionicons name="lock-closed-outline" size={20} color="#C5A059" />
-          </View>
-          <TextInput
-            className="flex-1 text-white text-base px-3"
-            style={
-              Platform.OS === "android"
-                ? { paddingVertical: 0, includeFontPadding: false }
-                : {}
-            }
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            placeholderTextColor="rgba(255, 255, 255, 0.3)"
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-          />
-          <TouchableOpacity
-            className="h-full justify-center px-4"
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Ionicons
-              name={showPassword ? "eye-outline" : "eye-off-outline"}
-              size={20}
-              color="#C5A059"
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
-
   return (
-    <View className="flex-1 bg-[#010302]">
+    <View className="flex-1 bg-[#F0F7FA]">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -143,23 +143,23 @@ const ChangePassword = () => {
             keyboardShouldPersistTaps="handled"
           >
             <View className="items-center mb-8 mt-4">
-              <View className="w-20 h-20 rounded-full bg-[#C5A059]/10 items-center justify-center border border-[#C5A059]/30 mb-4">
+              <View className="w-20 h-20 rounded-full bg-[#E91E63]/10 items-center justify-center border border-pink-100 mb-4 shadow-sm">
                 <Ionicons
                   name="shield-checkmark-outline"
                   size={36}
-                  color="#C5A059"
+                  color="#E91E63"
                 />
               </View>
-              <Text className="text-white text-lg font-RoyalBold text-center">
+              <Text className="text-[#2D89B5] text-xl font-RoyalBold text-center">
                 Secure Your Account
               </Text>
-              <Text className="text-white/50 text-xs text-center mt-2 px-4">
+              <Text className="text-gray-500 font-medium text-xs text-center mt-2 px-4">
                 Please enter your current password to create a new one. Make
                 sure it's strong and unique.
               </Text>
             </View>
 
-            <View className="bg-[#12402D]/40 p-6 rounded-[30px] border border-[#C5A059]/20 mb-8 shadow-lg">
+            <View className="bg-white p-6 rounded-[30px] border border-blue-50 mb-8 shadow-lg shadow-blue-100">
               <PasswordInput
                 label="Current Password"
                 value={currentPassword}
@@ -169,7 +169,7 @@ const ChangePassword = () => {
                 placeholder="Enter current password"
               />
 
-              <View className="h-[1px] w-full bg-[#C5A059]/10 my-2" />
+              <View className="h-[1px] w-full bg-blue-50 my-2" />
 
               <View className="mt-4">
                 <PasswordInput
@@ -195,25 +195,25 @@ const ChangePassword = () => {
             <View className="flex-row gap-4 mb-6">
               <TouchableOpacity
                 activeOpacity={0.8}
-                className="flex-1 bg-white/10 h-14 rounded-2xl justify-center items-center border border-[#C5A059]/20"
+                className="flex-1 bg-white h-14 rounded-2xl justify-center items-center border border-blue-100 shadow-sm"
                 onPress={() => router.back()}
               >
-                <Text className="text-white font-bold text-sm uppercase tracking-wider">
+                <Text className="text-[#2D89B5] font-black text-sm uppercase tracking-wider">
                   Cancel
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 activeOpacity={0.8}
-                className="flex-1 bg-[#C5A059] h-14 rounded-2xl justify-center items-center shadow-lg flex-row gap-2"
+                className="flex-1 bg-[#2D89B5] h-14 rounded-2xl justify-center items-center shadow-md shadow-blue-200 flex-row gap-2"
                 onPress={handleUpdatePassword}
               >
                 <Ionicons
                   name="checkmark-circle-outline"
                   size={20}
-                  color="#0B2B1F"
+                  color="#FFF"
                 />
-                <Text className="text-[#0B2B1F] font-extrabold text-sm tracking-widest uppercase">
+                <Text className="text-white font-black text-sm tracking-widest uppercase">
                   Update
                 </Text>
               </TouchableOpacity>

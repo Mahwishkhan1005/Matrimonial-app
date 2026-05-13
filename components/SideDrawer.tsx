@@ -46,35 +46,41 @@ const SideDrawer = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#010302]">
-      <View className="p-6 border-b border-[#C5A059]/20">
+    <SafeAreaView className="flex-1 bg-[#F0F7FA]">
+      {/* Header Section */}
+      <View className="p-6 border-b border-blue-100 bg-white shadow-sm">
         <Text
           style={{ fontFamily: "RoyalBold" }}
-          className="text-[#C5A059] text-xl"
+          className="text-[#2D89B5] text-xl"
         >
           Profile Id: {user?.profileId || "PF27765"}
         </Text>
       </View>
 
-      <ScrollView className="flex-1 px-4 mt-4">
+      {/* Menu Items */}
+      <ScrollView
+        className="flex-1 px-4 mt-4"
+        showsVerticalScrollIndicator={false}
+      >
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
             onPress={() => router.push(item.route as any)}
-            className="flex-row items-center p-4 mb-2 bg-[#0B2B1F]/40 rounded-xl border border-[#C5A059]/10"
+            className="flex-row items-center p-4 mb-3 bg-white rounded-xl border border-blue-50 shadow-sm shadow-blue-100"
           >
-            <Ionicons name={item.icon as any} size={20} color="#C5A059" />
-            <Text className="text-white/80 ml-4 font-medium">{item.label}</Text>
+            <Ionicons name={item.icon as any} size={20} color="#2D89B5" />
+            <Text className="text-[#333] ml-4 font-bold">{item.label}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
+      {/* Sign Out Button */}
       <TouchableOpacity
         onPress={handleSignOut}
-        className="m-6 bg-[#C5A059] p-4 rounded-xl items-center flex-row justify-center"
+        className="m-6 bg-[#E91E63] p-4 rounded-xl items-center flex-row justify-center shadow-lg shadow-pink-200"
       >
-        <Ionicons name="log-out-outline" size={20} color="#0B2B1F" />
-        <Text className="text-[#0B2B1F] font-bold ml-2 uppercase tracking-widest">
+        <Ionicons name="log-out-outline" size={20} color="#FFF" />
+        <Text className="text-white font-black ml-2 uppercase tracking-widest">
           Sign Out
         </Text>
       </TouchableOpacity>

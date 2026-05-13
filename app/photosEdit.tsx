@@ -72,8 +72,8 @@ const PhotosEdit = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#010302]">
-      {/* Gradient Header */}
+    <View className="flex-1 bg-[#F0F7FA]">
+      {/* Header */}
       <TopNavBar title="Photos Update" />
 
       <ScrollView
@@ -85,7 +85,7 @@ const PhotosEdit = () => {
         <View className="flex-row flex-wrap justify-between">
           {[0, 1, 2, 3].map((index) => (
             <View key={index} className="mb-6">
-              <Text className="text-[#C5A059] font-RoyalBold mb-2 ml-1">
+              <Text className="text-[#2D89B5] font-RoyalBold mb-2 ml-1">
                 Image {index + 1}
               </Text>
 
@@ -93,7 +93,7 @@ const PhotosEdit = () => {
                 // State: Image Uploaded
                 <View
                   style={{ width: BOX_WIDTH, height: BOX_WIDTH * 1.2 }}
-                  className="rounded-2xl overflow-hidden border border-[#C5A059]/30 relative shadow-lg"
+                  className="rounded-2xl overflow-hidden border border-blue-100 relative shadow-md shadow-blue-100 bg-white"
                 >
                   <Image
                     source={{ uri: images[index] as string }}
@@ -107,13 +107,13 @@ const PhotosEdit = () => {
                   >
                     <TouchableOpacity
                       onPress={() => pickImage(index)}
-                      className="bg-white/20 p-2 rounded-full backdrop-blur-md"
+                      className="bg-[#2D89B5]/90 p-2 rounded-full backdrop-blur-md"
                     >
                       <Ionicons name="pencil" size={18} color="#FFF" />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => deleteImage(index)}
-                      className="bg-red-500/80 p-2 rounded-full backdrop-blur-md"
+                      className="bg-[#E91E63]/90 p-2 rounded-full backdrop-blur-md"
                     >
                       <Ionicons name="trash" size={18} color="#FFF" />
                     </TouchableOpacity>
@@ -125,15 +125,15 @@ const PhotosEdit = () => {
                   activeOpacity={0.7}
                   onPress={() => pickImage(index)}
                   style={{ width: BOX_WIDTH, height: BOX_WIDTH * 1.2 }}
-                  className="bg-[#0B2B1F]/60 rounded-2xl border-2 border-dashed border-[#C5A059]/30 justify-center items-center"
+                  className="bg-white rounded-2xl border-2 border-dashed border-blue-200 justify-center items-center shadow-sm shadow-blue-50"
                 >
-                  <View className="w-12 h-12 rounded-full bg-[#C5A059]/10 justify-center items-center mb-3">
-                    <Ionicons name="camera" size={24} color="#C5A059" />
+                  <View className="w-12 h-12 rounded-full bg-[#2D89B5]/10 justify-center items-center mb-3">
+                    <Ionicons name="camera" size={24} color="#2D89B5" />
                   </View>
-                  <Text className="text-[#C5A059] font-bold text-xs uppercase tracking-wider">
+                  <Text className="text-[#2D89B5] font-bold text-xs uppercase tracking-wider">
                     Click Here
                   </Text>
-                  <Text className="text-white/50 text-[10px] mt-1">
+                  <Text className="text-gray-400 font-medium text-[10px] mt-1">
                     Upload Photo
                   </Text>
                 </TouchableOpacity>
@@ -143,21 +143,25 @@ const PhotosEdit = () => {
         </View>
 
         {/* Approval Status Section */}
-        <View className="bg-[#12402D]/40 p-6 rounded-[30px] border border-[#C5A059]/20 mt-4 mb-8">
-          <Text className="text-white text-lg font-RoyalBold mb-4">
+        <View className="bg-white p-6 rounded-[30px] border border-blue-50 mt-4 mb-8 shadow-md shadow-blue-100">
+          <Text className="text-[#2D89B5] text-lg font-RoyalBold mb-4">
             Photo Approve Status:
           </Text>
 
           {[0, 1, 2, 3].map((index) => (
             <View key={index} className="flex-row items-center mb-3">
-              <Text className="text-white/80 font-medium w-20">
+              <Text className="text-[#333] font-bold w-20">
                 Image {index + 1}:
               </Text>
               <View
-                className={`px-3 py-1 rounded-full ${images[index] ? "bg-orange-500/20" : "bg-gray-500/20"}`}
+                className={`px-3 py-1 rounded-full ${
+                  images[index] ? "bg-orange-100" : "bg-gray-100"
+                }`}
               >
                 <Text
-                  className={`text-xs font-bold ${images[index] ? "text-orange-400" : "text-gray-400"}`}
+                  className={`text-[10px] uppercase tracking-wider font-black ${
+                    images[index] ? "text-orange-500" : "text-gray-400"
+                  }`}
                 >
                   {images[index] ? "Pending Review" : "Not Uploaded"}
                 </Text>
@@ -169,7 +173,7 @@ const PhotosEdit = () => {
         {/* Submit Button */}
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full bg-[#C5A059] h-16 rounded-2xl justify-center items-center shadow-xl mb-6"
+          className="w-full bg-[#E91E63] h-16 rounded-2xl justify-center items-center shadow-lg shadow-pink-200 mb-6"
           onPress={() => {
             const uploadedCount = images.filter((img) => img !== null).length;
             if (uploadedCount === 0) {
@@ -183,7 +187,7 @@ const PhotosEdit = () => {
             }
           }}
         >
-          <Text className="text-[#0B2B1F] font-extrabold text-lg tracking-widest uppercase">
+          <Text className="text-white font-extrabold text-lg tracking-widest uppercase">
             Submit
           </Text>
         </TouchableOpacity>

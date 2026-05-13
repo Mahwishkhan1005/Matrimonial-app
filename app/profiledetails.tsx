@@ -43,12 +43,12 @@ const AccordionItem = ({
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => setIsOpen(!isOpen)}
-        className="bg-[#0B2B1F] p-5 rounded-2xl flex-row justify-between items-center border border-[#C5A059]/10"
+        className="bg-white p-5 rounded-2xl flex-row justify-between items-center border border-blue-50 shadow-sm shadow-blue-100"
       >
         <View className="flex-row items-center">
           <Text
             style={{ fontFamily: "RoyalBold" }}
-            className="text-white text-lg"
+            className="text-[#2D89B5] text-lg"
           >
             {title}
           </Text>
@@ -56,7 +56,7 @@ const AccordionItem = ({
             <Ionicons
               name="lock-closed"
               size={16}
-              color="#C5A059"
+              color="#E91E63"
               style={{ marginLeft: 8 }}
             />
           )}
@@ -64,22 +64,22 @@ const AccordionItem = ({
         <Ionicons
           name={isOpen ? "chevron-up" : "chevron-down"}
           size={20}
-          color="#C5A059"
+          color="#2D89B5"
         />
       </TouchableOpacity>
       {isOpen && (
-        <View className="bg-[#0B2B1F]/40 p-5 rounded-b-2xl -mt-2 border-x border-b border-[#C5A059]/10">
+        <View className="bg-blue-50/50 p-5 rounded-b-2xl -mt-2 border-x border-b border-blue-50">
           {isLocked ? (
             <View className="items-center py-4">
-              <Ionicons name="diamond-outline" size={40} color="#C5A059" />
-              <Text className="text-white text-sm text-center mt-2 mb-4">
+              <Ionicons name="diamond-outline" size={40} color="#E91E63" />
+              <Text className="text-[#333] text-sm text-center font-medium mt-2 mb-4">
                 Take subscription to view {title.toLowerCase()}
               </Text>
               <TouchableOpacity
                 onPress={onUnlock}
-                className="bg-[#C5A059] px-6 py-2 rounded-full"
+                className="bg-[#E91E63] px-6 py-2 rounded-full shadow-sm shadow-pink-200"
               >
-                <Text className="text-black font-bold text-xs uppercase">
+                <Text className="text-white font-bold text-xs uppercase tracking-wider">
                   Take Membership
                 </Text>
               </TouchableOpacity>
@@ -110,21 +110,21 @@ const ProfileDetails = () => {
   const thumbnails = photos;
 
   return (
-    <View className="flex-1 bg-[#010302]">
+    <View className="flex-1 bg-[#F0F7FA]">
       {/* Header */}
       <View
         style={{ paddingTop: insets.top + 10 }}
-        className="bg-[#0B2B1F] px-6 pb-4 flex-row items-center border-b border-[#C5A059]/20"
+        className="bg-white px-6 pb-4 flex-row items-center border-b border-blue-100 shadow-sm"
       >
         <TouchableOpacity
           onPress={() => router.replace("/dashboard")}
           className="mr-4"
         >
-          <Ionicons name="arrow-back" size={24} color="#C5A059" />
+          <Ionicons name="arrow-back" size={24} color="#2D89B5" />
         </TouchableOpacity>
         <Text
           style={{ fontFamily: "RoyalBold" }}
-          className="text-white text-xl"
+          className="text-[#2D89B5] text-xl"
         >
           Profile Details
         </Text>
@@ -132,11 +132,11 @@ const ProfileDetails = () => {
 
       <ScrollView className="flex-1 p-6" showsVerticalScrollIndicator={false}>
         {/* Gallery Section */}
-        <View className="flex-row mb-8 bg-[#0B2B1F]/20 p-4 rounded-3xl border border-[#C5A059]/10">
+        <View className="flex-row mb-8 bg-white p-4 rounded-3xl border border-blue-50 shadow-md shadow-blue-100">
           <View className="flex-1 mr-4">
             <Image
               source={mainImage}
-              className="w-full h-80 rounded-2xl"
+              className="w-full h-80 rounded-2xl bg-blue-50"
               resizeMode="cover"
             />
           </View>
@@ -149,7 +149,9 @@ const ProfileDetails = () => {
               >
                 <Image
                   source={img}
-                  className="w-20 h-24 rounded-xl border border-[#C5A059]/20"
+                  className={`w-20 h-24 rounded-xl border-2 ${
+                    mainImage === img ? "border-[#E91E63]" : "border-blue-100"
+                  }`}
                   resizeMode="cover"
                 />
               </TouchableOpacity>
@@ -212,11 +214,11 @@ const ProfileDetails = () => {
 };
 
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <View className="flex-row justify-between py-2 border-b border-[#C5A059]/10">
-    <Text className="text-white/60 text-sm">{label}</Text>
+  <View className="flex-row justify-between py-3 border-b border-blue-100">
+    <Text className="text-gray-500 font-medium text-sm">{label}</Text>
     <Text
       style={{ fontFamily: "RoyalBold" }}
-      className="text-[#C5A059] text-sm"
+      className="text-[#2D89B5] text-sm"
     >
       {value}
     </Text>

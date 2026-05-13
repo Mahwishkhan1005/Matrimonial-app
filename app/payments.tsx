@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -13,6 +14,64 @@ import {
 import TopNavBar from "../components/TopNavBar";
 
 const { width } = Dimensions.get("window");
+
+// Moved outside to prevent re-rendering and keyboard dismissal issues
+const PaymentOption = ({
+  id,
+  title,
+  icon,
+  subtitle,
+  selectedMethod,
+  setSelectedMethod,
+}: any) => {
+  const isSelected = selectedMethod === id;
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() => setSelectedMethod(id)}
+      className={`flex-row items-center p-4 mb-4 rounded-2xl border shadow-sm ${
+        isSelected
+          ? "border-[#2D89B5] bg-blue-50"
+          : "border-blue-100 bg-white shadow-blue-50"
+      }`}
+    >
+      <View
+        className={`w-12 h-12 rounded-full justify-center items-center mr-4 ${
+          isSelected ? "bg-[#2D89B5]" : "bg-blue-50 border border-blue-100"
+        }`}
+      >
+        <Ionicons
+          name={icon}
+          size={24}
+          color={isSelected ? "#FFF" : "#2D89B5"}
+        />
+      </View>
+      <View className="flex-1">
+        <Text
+          style={{ fontFamily: "RoyalBold" }}
+          className="text-[#333] text-base"
+        >
+          {title}
+        </Text>
+        {subtitle ? (
+          <Text className="text-gray-500 font-medium text-xs mt-1">
+            {subtitle}
+          </Text>
+        ) : null}
+      </View>
+      <View
+        className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
+          isSelected ? "border-[#2D89B5]" : "border-gray-300"
+        }`}
+      >
+        {isSelected ? (
+          <View className="w-3 h-3 rounded-full bg-[#2D89B5]" />
+        ) : null}
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const Payments = () => {
   const router = useRouter();
@@ -74,56 +133,8 @@ const Payments = () => {
     },
   ];
 
-  const PaymentOption = ({ id, title, icon, subtitle }: any) => {
-    const isSelected = selectedMethod === id;
-
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() => setSelectedMethod(id)}
-        className={`flex-row items-center p-4 mb-4 rounded-2xl border ${
-          isSelected
-            ? "border-[#C5A059] bg-[#C5A059]/10"
-            : "border-[#C5A059]/20 bg-[#0B2B1F]/60"
-        }`}
-      >
-        <View
-          className={`w-12 h-12 rounded-full justify-center items-center mr-4 ${
-            isSelected ? "bg-[#C5A059]" : "bg-[#C5A059]/10"
-          }`}
-        >
-          <Ionicons
-            name={icon}
-            size={24}
-            color={isSelected ? "#0B2B1F" : "#C5A059"}
-          />
-        </View>
-        <View className="flex-1">
-          <Text
-            style={{ fontFamily: "RoyalBold" }}
-            className="text-white text-base"
-          >
-            {title}
-          </Text>
-          {subtitle ? (
-            <Text className="text-white/50 text-xs mt-1">{subtitle}</Text>
-          ) : null}
-        </View>
-        <View
-          className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
-            isSelected ? "border-[#C5A059]" : "border-white/20"
-          }`}
-        >
-          {isSelected ? (
-            <View className="w-3 h-3 rounded-full bg-[#C5A059]" />
-          ) : null}
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   return (
-    <View className="flex-1 bg-[#010302]">
+    <View className="flex-1 bg-[#F0F7FA]">
       {/* Header */}
       <TopNavBar title="Payments" />
 
@@ -135,11 +146,14 @@ const Payments = () => {
           style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
         >
           {/* Order Summary Card */}
-          <Text className="text-[#C5A059] text-xs font-RoyalBold mb-3 ml-1 uppercase tracking-wider">
+          <Text className="text-[#2D89B5] text-xs font-RoyalBold mb-3 ml-1 uppercase tracking-wider">
             Current Checkout
           </Text>
-          <View className="bg-gradient-to-r from-[#12402D] to-[#0D3325] p-5 rounded-3xl border border-[#C5A059]/20 mb-8 shadow-xl">
-            <View className="flex-row justify-between items-start mb-4 border-b border-[#C5A059]/10 pb-4">
+          <LinearGradient
+            colors={["#2D89B5", "#1A6B8C"]}
+            className="p-5 rounded-3xl border border-blue-300 mb-8 shadow-xl shadow-blue-200"
+          >
+            <View className="flex-row justify-between items-start mb-4 border-b border-white/20 pb-4">
               <View>
                 <Text
                   style={{ fontFamily: "RoyalBold" }}
@@ -147,25 +161,27 @@ const Payments = () => {
                 >
                   {planDetails.name}
                 </Text>
-                <Text className="text-white/60 text-sm mt-1">
+                <Text className="text-blue-100 font-medium text-sm mt-1">
                   Valid for {planDetails.duration}
                 </Text>
               </View>
-              <View className="bg-[#C5A059]/20 px-3 py-1 rounded-full">
-                <Text className="text-[#C5A059] text-xs font-bold">PRO</Text>
+              <View className="bg-white/20 px-3 py-1 rounded-full border border-white/30">
+                <Text className="text-white text-xs font-black">PRO</Text>
               </View>
             </View>
 
             <View className="flex-row justify-between mb-2">
-              <Text className="text-white/70">Plan Price</Text>
-              <Text className="text-white">₹{planDetails.price}</Text>
+              <Text className="text-blue-50 font-medium">Plan Price</Text>
+              <Text className="text-white font-bold">₹{planDetails.price}</Text>
             </View>
             <View className="flex-row justify-between mb-4">
-              <Text className="text-green-400">Special Discount</Text>
-              <Text className="text-green-400">- ₹{planDetails.discount}</Text>
+              <Text className="text-pink-200 font-bold">Special Discount</Text>
+              <Text className="text-pink-200 font-bold">
+                - ₹{planDetails.discount}
+              </Text>
             </View>
 
-            <View className="flex-row justify-between items-center border-t border-[#C5A059]/20 pt-4 mt-2">
+            <View className="flex-row justify-between items-center border-t border-white/20 pt-4 mt-2">
               <Text
                 style={{ fontFamily: "RoyalBold" }}
                 className="text-white text-lg"
@@ -174,14 +190,14 @@ const Payments = () => {
               </Text>
               <Text
                 style={{ fontFamily: "RoyalBold" }}
-                className="text-[#C5A059] text-2xl"
+                className="text-white text-2xl"
               >
                 ₹{planDetails.total}
               </Text>
             </View>
-          </View>
+          </LinearGradient>
           {/* Payment Methods */}
-          <Text className="text-[#C5A059] text-xs font-RoyalBold mb-3 ml-1 uppercase tracking-wider">
+          <Text className="text-[#2D89B5] text-xs font-RoyalBold mb-3 ml-1 uppercase tracking-wider">
             Select Payment Method
           </Text>
           <PaymentOption
@@ -189,13 +205,15 @@ const Payments = () => {
             title="UPI (GPay, PhonePe, Paytm)"
             icon="phone-portrait-outline"
             subtitle="Pay directly from your bank account"
+            selectedMethod={selectedMethod}
+            setSelectedMethod={setSelectedMethod}
           />
           {selectedMethod === "upi" ? (
             <View className="mb-4 -mt-2 ml-4">
               <TextInput
-                className="h-12 bg-white/5 rounded-xl px-4 text-white border border-[#C5A059]/20"
+                className="h-14 bg-white rounded-2xl px-4 text-[#333] border border-blue-100 shadow-sm shadow-blue-50 font-medium"
                 placeholder="Enter UPI ID (e.g. name@okhdfc)"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="#9CA3AF"
               />
             </View>
           ) : null}
@@ -204,44 +222,50 @@ const Payments = () => {
             title="Credit / Debit Card"
             icon="card-outline"
             subtitle="Visa, MasterCard, RuPay accepted"
+            selectedMethod={selectedMethod}
+            setSelectedMethod={setSelectedMethod}
           />
           <PaymentOption
             id="netbanking"
             title="Net Banking"
             icon="business-outline"
             subtitle="All major Indian banks available"
+            selectedMethod={selectedMethod}
+            setSelectedMethod={setSelectedMethod}
           />
           {/* Transaction History Section */}
           <View className="mt-8 mb-4 flex-row items-center justify-between">
-            <Text className="text-[#C5A059] text-xs font-RoyalBold ml-1 uppercase tracking-wider">
+            <Text className="text-[#2D89B5] text-xs font-RoyalBold ml-1 uppercase tracking-wider">
               Payment History
             </Text>
             <TouchableOpacity>
-              <Text className="text-white/50 text-xs underline">View All</Text>
+              <Text className="text-[#E91E63] font-bold text-xs underline">
+                View All
+              </Text>
             </TouchableOpacity>
           </View>
           {transactionHistory.map((txn, index) => (
             <View
               key={index}
-              className="bg-[#0B2B1F]/40 p-4 rounded-2xl border border-[#C5A059]/10 mb-3 flex-row items-center justify-between"
+              className="bg-white p-4 rounded-2xl border border-blue-50 mb-3 flex-row items-center justify-between shadow-sm shadow-blue-50"
             >
               <View className="flex-row items-center flex-1">
-                <View className="w-10 h-10 rounded-full bg-white/5 justify-center items-center mr-3 border border-[#C5A059]/10">
-                  <Ionicons name={txn.icon as any} size={18} color="#C5A059" />
+                <View className="w-10 h-10 rounded-full bg-blue-50 justify-center items-center mr-3 border border-blue-100">
+                  <Ionicons name={txn.icon as any} size={18} color="#2D89B5" />
                 </View>
                 <View className="flex-1 pr-2">
                   <Text
                     style={{ fontFamily: "RoyalBold" }}
-                    className="text-white text-sm"
+                    className="text-[#333] text-sm"
                     numberOfLines={1}
                   >
                     {txn.title}
                   </Text>
                   <View className="flex-row items-center mt-1">
-                    <Text className="text-white/40 text-[10px] mr-2">
+                    <Text className="text-gray-400 font-medium text-[10px] mr-2">
                       {txn.date}
                     </Text>
-                    <Text className="text-white/30 text-[10px]">
+                    <Text className="text-gray-400 font-medium text-[10px]">
                       • ID: {txn.id}
                     </Text>
                   </View>
@@ -251,22 +275,20 @@ const Payments = () => {
               <View className="items-end pl-2">
                 <Text
                   style={{ fontFamily: "RoyalBold" }}
-                  className="text-white text-base mb-1"
+                  className="text-[#333] text-base mb-1"
                 >
                   {txn.amount}
                 </Text>
                 <View
                   className={`px-2 py-0.5 rounded-full ${
-                    txn.status === "Success"
-                      ? "bg-green-500/20"
-                      : "bg-red-500/20"
+                    txn.status === "Success" ? "bg-green-100" : "bg-red-100"
                   }`}
                 >
                   <Text
-                    className={`text-[9px] font-bold uppercase ${
+                    className={`text-[9px] font-bold uppercase tracking-wider ${
                       txn.status === "Success"
-                        ? "text-green-400"
-                        : "text-red-400"
+                        ? "text-green-600"
+                        : "text-red-500"
                     }`}
                   >
                     {txn.status}
@@ -280,25 +302,25 @@ const Payments = () => {
       </ScrollView>
 
       {/* Sticky Bottom Payment Button */}
-      <View className="bg-[#0A1C14] border-t border-[#C5A059]/20 p-6 pb-8">
+      <View className="bg-white border-t border-blue-100 p-6 pb-8">
         <View className="flex-row justify-center items-center mb-4">
           <Ionicons name="shield-checkmark" size={16} color="#4ade80" />
-          <Text className="text-white/50 text-xs ml-2">
+          <Text className="text-gray-500 font-medium text-xs ml-2">
             100% Secure & Encrypted Payment
           </Text>
         </View>
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full bg-[#C5A059] h-14 rounded-2xl justify-center items-center shadow-lg flex-row"
+          className="w-full bg-[#E91E63] h-14 rounded-2xl justify-center items-center shadow-lg shadow-pink-200 flex-row"
           onPress={() => console.log("Processing Payment...")}
         >
-          <Text className="text-[#0B2B1F] font-extrabold text-lg tracking-widest uppercase">
+          <Text className="text-white font-extrabold text-lg tracking-widest uppercase">
             Pay ₹{planDetails.total}
           </Text>
           <Ionicons
             name="arrow-forward"
             size={20}
-            color="#0B2B1F"
+            color="#FFF"
             style={{ marginLeft: 8 }}
           />
         </TouchableOpacity>
