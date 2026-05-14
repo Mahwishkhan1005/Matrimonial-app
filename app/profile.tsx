@@ -1,8 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import api from "../axios/axiosInterceptor";
 import {
+    Animated,
     Dimensions,
     Image,
     Modal,
@@ -20,10 +22,50 @@ const Profile = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [scaleAnim] = useState(new Animated.Value(0));
+  const [profileData, setProfileData] = useState<any>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get("/user/profile");
+      setProfileData(response.data);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
 
   const handleLogout = async () => {
-    await logout();
-    router.replace("/");
+    setShowLogoutModal(false);
+    try {
+      // Call backend logout endpoint
+      await api.post("/user/logout");
+      // Clear local session
+      await logout();
+      router.replace("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Still logout locally if server fails or session is already invalid
+      await logout();
+      router.replace("/");
+    }
+  };
+
+  const showLogoutConfirmation = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 5,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+    setShowLogoutModal(true);
   };
 
   const profileStats = [
@@ -55,7 +97,11 @@ const Profile = () => {
           <View className="relative">
             <View className="w-32 h-32 rounded-full border-4 border-white/30 p-1">
               <Image
-                source={require("../assets/images/groom1.png")}
+                source={
+                  profileData?.images && profileData.images.length > 0
+                    ? { uri: profileData.images[0] }
+                    : require("../assets/images/groom1.png")
+                }
                 className="w-full h-full rounded-full"
                 resizeMode="cover"
               />
@@ -72,7 +118,7 @@ const Profile = () => {
             style={{ fontFamily: "RoyalBold" }}
             className="text-white text-3xl mt-4"
           >
-            {user?.name || "Mahwish Khan"}
+            {profileData?.name || user?.name || "User"}
           </Text>
           <View className="bg-white/20 px-4 py-1 rounded-full mt-2 border border-white/30">
             <Text className="text-white text-[10px] font-bold uppercase tracking-[2px]">
@@ -154,7 +200,7 @@ const Profile = () => {
           ))}
 
           <TouchableOpacity
-            onPress={handleLogout}
+            onPress={showLogoutConfirmation}
             className="flex-row items-center bg-white p-5 rounded-2xl mt-4 border border-red-50 shadow-sm"
           >
             <View className="bg-red-500 p-2.5 rounded-xl shadow-sm shadow-red-200">
@@ -166,6 +212,65 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        visible={showLogoutModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowLogoutModal(false)}
+      >
+        <View className="flex-1 bg-black/70 justify-center items-center">
+          <Animated.View
+            style={{
+              transform: [{ scale: scaleAnim }],
+            }}
+            className="bg-white rounded-3xl p-6 mx-6 w-[85%] max-w-[400px] border border-[#2D89B5]/30 shadow-xl"
+          >
+            <View className="items-center mb-4">
+              <View className="w-16 h-16 rounded-full bg-[#E91E63]/15 justify-center items-center mb-3">
+                <Ionicons name="log-out-outline" size={32} color="#E91E63" />
+              </View>
+              <Text
+                style={{ fontFamily: "RoyalBold" }}
+                className="text-gray-800 text-xl text-center"
+              >
+                Logout Confirmation
+              </Text>
+              <View className="w-12 h-0.5 bg-[#2D89B5]/30 rounded-full mt-2" />
+            </View>
+
+            <Text className="text-gray-600 text-center text-base mt-2 mb-6">
+              Are you sure you want to logout? You will need to login again to
+              access your account.
+            </Text>
+
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => setShowLogoutModal(false)}
+                className="flex-1 bg-gray-100 py-3 rounded-xl border border-gray-200"
+              >
+                <Text className="text-gray-700 text-center font-bold text-sm uppercase tracking-wider">
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={handleLogout}
+                className="flex-1 bg-[#E91E63] py-3 rounded-xl shadow-lg"
+              >
+                <View className="flex-row items-center justify-center gap-2">
+                  <Ionicons name="log-out-outline" size={18} color="#FFF" />
+                  <Text className="text-white text-center font-bold text-sm uppercase tracking-wider">
+                    Logout
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
 
       {/* Help & Support Modal */}
       <Modal

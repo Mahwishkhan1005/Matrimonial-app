@@ -14,102 +14,35 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TopNavBar from "../components/TopNavBar";
 
+import api from "../axios/axiosInterceptor";
+
 const { width } = Dimensions.get("window");
 const COLUMN_WIDTH = (width - 48) / 2; // 24px padding on sides, 12px gap
-
-const BRIDE_PROFILES = [
-  {
-    id: "1",
-    name: "Bhavya",
-    age: 26,
-    status: "Recently Active",
-    image: require("../assets/images/bride1.png"),
-  },
-  {
-    id: "2",
-    name: "Bhargavi",
-    age: 26,
-    status: "Recently Active",
-    image: require("../assets/images/bride2.png"),
-  },
-  {
-    id: "3",
-    name: "Harshini",
-    age: 26,
-    status: "Recently Active",
-    image: require("../assets/images/bride3.png"),
-  },
-  {
-    id: "4",
-    name: "Saparya",
-    age: 28,
-    status: "Recently Active",
-    image: require("../assets/images/bride4.png"),
-  },
-  {
-    id: "5",
-    name: "Divya",
-    age: 26,
-    status: "Recently Active",
-    image: require("../assets/images/bride5.png"),
-  },
-  {
-    id: "6",
-    name: "Teena",
-    age: 27,
-    status: "Recently Active",
-    image: require("../assets/images/bride6.png"),
-  },
-  {
-    id: "7",
-    name: "Ananya",
-    age: 25,
-    status: "Recently Active",
-    image: require("../assets/images/bride1.png"),
-  },
-  {
-    id: "8",
-    name: "Meera",
-    age: 29,
-    status: "Recently Active",
-    image: require("../assets/images/bride2.png"),
-  },
-  {
-    id: "9",
-    name: "Pooja",
-    age: 27,
-    status: "Recently Active",
-    image: require("../assets/images/bride3.png"),
-  },
-  {
-    id: "10",
-    name: "Sneha",
-    age: 24,
-    status: "Recently Active",
-    image: require("../assets/images/bride4.png"),
-  },
-  {
-    id: "11",
-    name: "Kirti",
-    age: 28,
-    status: "Recently Active",
-    image: require("../assets/images/bride5.png"),
-  },
-  {
-    id: "12",
-    name: "Riya",
-    age: 26,
-    status: "Recently Active",
-    image: require("../assets/images/bride6.png"),
-  },
-];
 
 const BrideProfiles = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [profiles, setProfiles] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const fetchProfiles = async () => {
+    try {
+      const response = await api.get("/user/brides/all");
+      if (response.data && response.data.content) {
+        setProfiles(response.data.content);
+      }
+    } catch (error) {
+      console.error("Error fetching bride profiles:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
+    fetchProfiles();
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
@@ -117,20 +50,36 @@ const BrideProfiles = () => {
     }).start();
   }, []);
 
-  const renderItem = ({ item }: { item: (typeof BRIDE_PROFILES)[0] }) => (
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchProfiles();
+  };
+
+  const calculateAge = (birthYear: number) => {
+    if (!birthYear) return "N/A";
+    const currentYear = new Date().getFullYear();
+    return currentYear - birthYear;
+  };
+
+  
+  const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={() =>
         router.push({
           pathname: "/profiledetails",
-          params: { gender: "female" },
+          params: { profileId: item.profileId, gender: "female" },
         })
       }
       style={{ width: COLUMN_WIDTH, height: COLUMN_WIDTH * 1.4 }}
       className="m-1.5 rounded-[24px] overflow-hidden border-2 border-white shadow-xl bg-white"
     >
       <Image
-        source={item.image}
+        source={
+          item.images && item.images.length > 0
+            ? { uri: item.images[0] }
+            : require("../assets/images/bride1.png") // Fallback
+        }
         style={{ width: "100%", height: "100%" }}
         resizeMode="cover"
       />
@@ -148,12 +97,12 @@ const BrideProfiles = () => {
           style={{ fontFamily: "RoyalBold" }}
           className="text-white/80 text-xs"
         >
-          {item.age} Yrs
+          {calculateAge(item.birthYear)} Yrs
         </Text>
         <View className="flex-row items-center mt-1">
           <View className="w-2 h-2 rounded-full bg-green-500 mr-1.5" />
           <Text className="text-white/60 text-[10px] font-bold">
-            {item.status}
+            {"Recently Active"}
           </Text>
         </View>
       </LinearGradient>
@@ -170,17 +119,31 @@ const BrideProfiles = () => {
       <TopNavBar title="Brides Profiles" />
 
       <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-        <FlatList
-          data={BRIDE_PROFILES}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          contentContainerStyle={{ padding: 12 }}
-          showsVerticalScrollIndicator={false}
-        />
+        {loading ? (
+          <View className="flex-1 justify-center items-center">
+            <Text className="text-[#2D89B5] font-bold">Loading Profiles...</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={profiles}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={{ padding: 12 }}
+            showsVerticalScrollIndicator={false}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            ListEmptyComponent={
+              <View className="flex-1 justify-center items-center py-20">
+                <Text className="text-gray-500">No profiles found</Text>
+              </View>
+            }
+          />
+        )}
       </Animated.View>
     </View>
   );
 };
 
 export default BrideProfiles;
+

@@ -4,6 +4,7 @@ import { useNavigation, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Animated, Modal, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import api from "../axios/axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 
 const TopNavBar = ({
@@ -21,8 +22,18 @@ const TopNavBar = ({
 
   const handleLogout = async () => {
     setShowLogoutModal(false);
-    await logout();
-    router.replace("/");
+
+    try {
+      // Call the backend logout endpoint
+      await api.post("/user/logout");
+    } catch (error) {
+      console.error("Backend logout error:", error);
+      // We continue with local logout even if the server call fails
+    } finally {
+      // Clear local auth context/tokens and redirect
+      await logout();
+      router.replace("/");
+    }
   };
 
   const showLogoutConfirmation = () => {

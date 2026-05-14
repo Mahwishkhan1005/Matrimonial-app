@@ -11,9 +11,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <Drawer
-          // FIX: Pass props down to prevent silent React Navigation errors
           drawerContent={() => <SideDrawer />}
           backBehavior="history"
+          initialRouteName="dashboard"
           screenOptions={{
             headerShown: false,
             drawerStyle: { width: "80%" },
@@ -37,7 +37,7 @@ export default function RootLayout() {
           {/* Profile & Match Screens (FIX: Added all missing screens) */}
           <Drawer.Screen name="groomprofiles" />
           <Drawer.Screen name="brideprofiles" />
-          <Drawer.Screen name="profiledetails" />
+          <Drawer.Screen name="profiledetails" />F
           <Drawer.Screen name="quick-match" />
 
           {/* SideDrawer Specific Screens */}

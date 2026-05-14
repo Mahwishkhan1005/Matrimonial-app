@@ -140,6 +140,10 @@ const MatrimonialLogin = () => {
     }
   };
 
+  if (isLoading || user) {
+    return null;
+  }
+
   return (
     <View className="flex-1 bg-[#F0F7FA]">
       <SafeAreaView className="flex-1">
